@@ -2,10 +2,10 @@
 ## Encryption stuff.
 
 def decodePadDungeon(e):
-    return NotImplementedError("Secret info, do not share.")
+    return NotImplementedError("Don't know how to do that.")
 
 def encodePadDungeon(p: str, key: int):
-    return NotImplementedError("Secret info, do not share.")
+    return NotImplementedError("Don't know how to do that.")
 
 
 def _test():
