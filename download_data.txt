@@ -1,0 +1,31 @@
+SEE ALSO: "upload_data notes.txt"
+
+12 - download_data.json
+    #high scores.
+    res:0
+    dcnt: 37
+        type of data?
+    data: jsonstring:
+        hs: list (flat)
+            It goes:
+                'd'
+                dungeon id
+                floor
+                score1
+                score2
+                score3
+
+13 - download_data.json
+    #favorite friends
+    res:0
+    dcnt: 32
+    data: json string:
+        fav: list[playerID]
+
+14 - download_data.json
+    #favorite monsters?
+    res:0
+    dcnt: 102
+    data: json string:
+        fav: list[monsterID]
+        

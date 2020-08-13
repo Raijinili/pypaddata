@@ -1,0 +1,152 @@
+Download quest list.
+
+Response: json
+    res:= 0
+        Result code.
+    v:= 930
+        Version
+    d: padutil.gh_csv
+        Data.
+
+Data: list[list[str, 10-14]]
+    ! Remember that CSV is a table of str. Do the conversion manually.
+    - 0: ?="A"
+    - 1: int
+        qid - Quest ID.
+    - 2: int
+        Category?
+        1. Degree of Difficulty
+        2. Descended
+        3. Maniacs
+        9. No Continue Quests
+        11. February Quest
+        12. March Quest
+    - 3: int
+        Subcategory?
+        .3.//10000 == .2.
+    - 4: str
+        Name
+    - 5: int
+        Reward type.
+    - 6: int
+        Reward var.
+    - 7: int
+        Requirement type.
+    - 8: int
+        Requirement var.
+    - 9: int
+        Flags for more arguments.
+        [0] priority?
+        [1] prereq?
+            Prerequisite quest
+            Only for subcategories.
+        [2] begin: gh_time
+        [3] end: gh_time
+        [4] note: str
+            Note next to dungeon name.
+    - *rest:
+        More requirement vars.
+
+Requirement type:
+    1: Category?
+    2: Group?
+        "Clear all in this group"
+    3: Normal Dungeon clears
+        ? Does it count each difficulty, or a whole group?
+    4: Technical Dungeon clears
+    5: Special Dungeon clears
+    6: Co-op Dungeon clears
+        ? Pretty sure this counts a single difficulty.
+    7: Box capacity
+    8: <no quests known>
+    9: Monster Book
+    10: Ranking Dungeon percentile
+    11: <none seen>
+    12: +297s
+    13: Crowns
+    14: Awoken Skills
+    
+    22: Dungeon(s) cleared.
+        var//1000: dungeon ID
+        var%1000: floor index
+    23: Solo dungeon cleared.
+        Same var interpretation as [22].
+
+
+===
+
+def pack_quest(quest):
+    """ Pack the tail variables.
+    
+    quest[9] is a bitset (length 5?) that represents which columns are packed in the tail.
+    
+    The rest of the tail variables are requirement variables.
+    
+    rv[8] is a list of requirement variables. rv[9:14] are the other variables.
+    """
+    rv, rest = quest[:9], quest[9:]
+    flags, *vals = rest
+    flags = list(map(int, bin(int(flags))[2:].zfill(5)))[::-1]
+    assert len(flags) <= 5
+    tail = iter(vals)
+    for flag in flags:
+        rv.append(next(tail) if flag else '')
+    rv[8] = [rv[8], *tail]
+    return rv
+
+
+
+===
+
+from padutil import gh_csv
+
+
+def unpack_quest(quest):
+    """ Unpack the extension variable.
+    """
+    rv, rest = quest[:9], quest[9:]
+    flags, *vals = rest
+    flags = list(map(int, bin(int(flags))[2:].zfill(5)))[::-1]
+    assert len(flags) <= 5
+    vals = list(vals)[::-1]
+    for flag in flags:
+        rv.append(vals.pop() if flag else '')
+    #assert not vals
+    rv.extend(vals[::-1])
+    return rv
+
+
+
+j = json.loads(bah[0])
+al = j['d']
+quests = gh_csv(al)
+
+
+with open('temp.out', 'w', encoding='utf-8') as file:
+    for quest in quests:
+        print(*unpack_quest(quest), sep='\t', file=file)
+
+
+
+===
+
+- Only one instance found:
+    - Tue Jul 05 15:57:10 EDT 2016
+    - api-ht-adr.padsv.gungho.jp
+    - /api.php?action=dl_al&pid={PID}&sid={SID}&r=930&m=0&key={KEY}
+    - {"res":0,"v":930,"d":"A,1,1,10000,\u96e3\u6613\u5ea6\u5225,0,0,1,0,28,160501120000,160831120000,\u203b\u30d1\u30ba\u30c9\u30e9\u30ec\u30fc\u30c0\u30fc\u5bfe\u8c61\u5916\nA,2,1,10001,\u521d\u7d1a,9917,1,2,0,0\nA,3,1,10001,\u30ce\u30fc\u30de\u30eb\u30c0\u30f3\u30b8\u30e7\u30f310\u500b\u8e0f\u7834,9902,1000,3,10,0\nA,4,1,10001,\u30e2\u30f3\u30b9\u30bf\u30fcBOX\u67a0\u309230\u500b\u306b\u3059\u308b,9901,1,7,30,0\nA,5,1,10001,\u6c34\u66dc\u30c0\u30f3\u30b8\u30e7\u30f3 \u4eee\u9762\u306e\u9593,181,1,22,103001,0\nA,6,1,10001,\u6728\u66dc\u30c0\u30f3\u30b8\u30e7\u30f3 \u7dd1\u9f8d\u306e\u5de3\u7a9f \u4e2d\u7d1a,178,1,22,104001,0\nA,7,1,10001,\u91d1\u66dc\u30c0\u30f3\u30b8\u30e7\u30f3 \u7cbe\u970a\u306e\u7960 \u4e2d\u7d1a,797,1,22,105001,0\nA,8,1,10001,\u571f\u65e5\u30c0\u30f3\u30b8\u30e7\u30f3 3\u8272\u9650\u5b9a \u521d\u7d1a,9900,50000,22,121001,0\nA,9,1,10001,\u571f\u65e5\u30c0\u30f3\u30b8\u30e7\u30f3 3\u8272\u9650\u5b9a \u4e2d\u7d1a,9900,100000,22,121002,0"}
+    - d:
+        A,1,1,10000,難易度別,0,0,1,0,28,160501120000,160831120000,※パズドラレーダー対象外
+        A,2,1,10001,初級,9917,1,2,0,0
+        A,3,1,10001,ノーマルダンジョン10個踏破,9902,1000,3,10,0
+        A,4,1,10001,モンスターBOX枠を30個にする,9901,1,7,30,0
+        A,5,1,10001,水曜ダンジョン 仮面の間,181,1,22,103001,0
+        A,6,1,10001,木曜ダンジョン 緑龍の巣窟 中級,178,1,22,104001,0
+        A,7,1,10001,金曜ダンジョン 精霊の祠 中級,797,1,22,105001,0
+        A,8,1,10001,土日ダンジョン 3色限定 初級,9900,50000,22,121001,0
+        A,9,1,10001,土日ダンジョン 3色限定 中級,9900,100000,22,121002,0
+- Similar to shop_item and get_dung_sale.
+
+
+
+

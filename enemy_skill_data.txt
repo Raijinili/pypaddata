@@ -1,0 +1,433 @@
+raw_enemy_skill_data = json_data['enemy_skills']
+
+"""
+download_enemy_skill_data
+    v:
+        <missing>: First version.
+        2: Compact version.
+    enemy_skills: List[skill]
+        skill: (all known skills have the same keys)
+            name: str
+                Dummy values:
+                    *****
+                    なし
+                    ERROR\d+
+            help: str
+            type: int
+            skp1-8: int
+                Skill parameters
+            skp1:
+                parameter
+            skp2:
+                number of hits?
+            skp3:
+                damage% per hit?
+            ratio: int
+                = 100
+            (aip0-4:) int
+                AI parameters
+            aip0: int
+                = 100
+            aip1: int 1-100
+                hp%?
+                (use when <=X HP)
+            aip2:
+                priority? (4 seems normal)
+                can go up to 26384
+                >= 10000 => one-time use?
+            aip3: int
+                cooldown? (min turns before using again)
+            aip4: 30, 50, 60, 75, 80, 85, 90, 100, 110, 120, 150, 1000
+                damage% for some skills
+                0 if no damage
+
+! Compact version: ['enemy_skills']:csv.
+0   id
+1   name
+2   sktp
+3   
+    ? Samples:
+        1800
+        180f
+        100d
+        e
+        f
+4   
+
+
+type
+    0   unused?
+    1   random bind
+        skp(number, minturn, maxturn)
+    2   att bind
+        skp(att, minturn, maxturn)
+    3   type bind
+        skp(type, minturn, maxturn)
+    4   1 orb change
+        skp(from, to)
+        -1 for random
+    5   blind
+    6   debuff
+    7   cure self
+        skp(min%, max%)
+    8   buff next attack
+        skp(+min%, +max%)
+    9   defense buff
+        skp(turns, min, max)
+        (multiplier or bonus?)
+    12  att change to jammer
+        skp(att)
+    13  random color to jammer
+        skp(number of colors)
+    14  skillbind
+        skp(minturns, maxturns)
+    15  hit
+        skp(min, max, dmg%)
+    16  skip
+        skp(min?, max?, dmg%?)
+    17  attack multiplier
+        skp(??, turns, mult%)
+        skp1 is either turns or 1
+    18  attack multiplier
+        skp(turns?, mult%)
+    19  attack multiplier
+        skp(??, turns, mult%)
+    20  status immunity
+        skp(turns)
+    21-38   error?
+        37 has skill#27
+        29  Only use when HP >(=) value?
+            In the eskill tuple (skillid, ??, ??):
+            The second parameter is the HP%.
+            The third is the 1-based index of the skill in this card's eskills.
+    39  orb time penalty
+        skp(turns, penalty)
+        penalty is in tenths of a second (so 2 seconds => 20)
+    43-46   error?
+    47  hit (preemptives?)
+        skp(100?, dmg%?)
+    48  damage and orbchange
+        skp(dmg%, from, to)
+    49  debug? "Preemptive Command LV$X"
+        skp(X, 100)
+    50  gravity
+        skp(hp%)
+        "Not going easy anymore!" has other params. Probably copy-paste error.
+    51  unused
+    52  heal self to full?
+        skp(hp%)
+    53  absorb att
+        skp(minturn?, maxturn?, attflags)
+    54  bind leaders?
+        skp(leaders:flag, minturn, maxturn)
+        1 for yours, 2 for friend's, 3 for both.
+    55  player heal
+        skp(hp%)
+    56  color change to poison
+        skp(color)
+    57-59   unused
+    60  random poison
+        skp(number, :bool?)
+        no longer used?
+    62  damage and blind
+        skp(dmg%)
+    63  damage and bind sub
+        skp(dmg%, minturn, maxturn, ??, number)
+    64  damage and poison
+        skp(dmg%, number, :bool?)
+        no longer used?
+  need to confirm:
+    65  bind "allies"
+        skp(number, min, max)
+    66  charge (skip)
+    67  combo absorb of X or fewer
+        skp(minturns, maxturns, combos)
+    68  increase orb appearance
+        skp(colors:bitflags, minturns, maxturns, chance)
+    71  void damage over X
+        skp(turns?, ??, dmg)
+    72  resist colors
+        skp(colors:bitflags, res%)
+    73  resolve
+        skp(hp%)
+    74  resist all damage
+        skp(turns, res%)
+    75  leader rotates
+        skp=turns
+    76  cols change without damage?
+    77  damage and change cols to colors
+        skp=cols1:flag,clrs1:flag,cols2:flag,clrs2:flag,0,0,dmg%
+        up to two separate changes.
+    78  rows change without damage?
+    79  damage and change rowss to colors
+        skp=rows1:flag,clrs1:flag,rows2:flag,clrs2:flag,0,0,dmg%
+    81  damage and change all orbs
+        skp = dmg%, *colors, -1
+    82  
+        id=1	Disable Skill	Mitigate Active Skill
+    83  multiple skills
+        skp = *skillids
+        Names (not displayed) are "<X> Second Move" but it probably should be "double move"
+    84  change all orbs
+        skp = colors:flags
+    85  damage and change all orbs (using flags instead of a list?)
+        skp = dmg%, colors:flags
+    86  recover self
+        skp = min%, max%
+    87  absorb high damage
+        skp = turns, cap
+    89  cd+
+        skp = minturns, maxturns
+    90  "Jump" commands.
+        skp = *mon_ids
+        On a card, the (skillid, ??, ??) third parameter is the 1-based index into that card's eskills to the skill that will be used if any of the cards are in your party.
+    92  damage and spawn orbs
+        skp = number, exclude:clrs, to:clrs
+            or to:clrs, exclude:clrs
+        aip4 = dmg%?
+    94  damage and lock orbs
+        skp = :clrs, ??
+        aip4 = dmg%
+    
+
+j = json.load(r"1 - download_enemy_skill_data.json")
+
+es = j['enemy_skills']
+
+
+import codecs
+
+keys = "name help type skp1 skp2 skp3 skp4 skp5 skp6 skp7 skp8 ratio aip0 aip1 aip2 aip3 aip4".split()
+
+with codecs.open('temp.out', 'w', 'utf-8') as f:
+    def write(*args, **kwargs):
+        args = map(lambda s: s.replace('\n', '\\n'), map(str, args))
+        
+        print(*args, file=f, sep='\t', **kwargs)
+    
+    write('id', *keys)
+    for i, e in enumerate(es):
+        write(i, *map(e.get, keys))
+
+"""
+
+"""
+#Before November
+
+j = json.load(open(r"download_enemy_skill_data 2015-12-22.json"))
+es_ = j['enemy_skills']
+es = Bag(es_)
+"""
+
+"""
+#Format after December:
+#CSV?
+    # It can have commas, newlines, quotes
+    #   ` 'Divine King's Warning'
+#id,name,type,flags,*args,priority,??
+# last line is c: CRC?
+
+0   id
+1   name
+    bad case: 52 'Divine King's Warning'
+2   type
+3   flags: hex
+    Which args appear.
+    Used flags: 0111100011111111
+    
+    0   help=''
+    1-8 skp#=0
+        
+    9   ratio=100
+    A   aip0=100
+    B   aip1=100
+    C   aip2=10000
+    D   aip3=0
+    E   aip4=0
+#
+
+esargs = [
+    ('help', ''),
+] + [
+    ('skp%d' % i, 0) for i in range(1, 9)
+] + [
+    ('ratio', 100),
+    ('aip0', 100),
+    ('aip1', 100),
+    ('aip2', 10000),
+    ('aip3', 0),
+    ('aip4', 0),
+]
+esnames = [arg[0] for arg in esargs]
+esdefaults = [arg[1] for arg in esargs]
+
+# def check_eskill(line):
+    # sid = int(line[0])
+    
+    # try:
+        # skill = es[sid]
+    # except IndexError: #too new
+        # return True
+    
+    # flags = int(line[3], 16)
+    
+    # #eskill = {}
+    # #eskill['name'] = line[2]
+    # #eskill['type'] = int(line[2])
+    
+    # it = iter(line[4:])
+    
+    # #skip help
+    # if flags % 2:
+        # next(it)
+    # flags //= 2
+    
+    # for arg, default in esargs[1:]:
+        # if flags % 2:
+            # val = type(default)(next(it))
+        # else:
+            # val = default
+        # flags //= 2
+        
+        # if val != skill[arg]:
+            # return False
+    
+    # return True
+
+
+# fails = [line[0] for line in lines if not check_eskill(line)]
+
+
+# def parse_enemy_skills(raw):
+    # it = peekiter(raw)
+    # line = []
+    # lines = []
+    # buf = []
+
+    # for c in it:
+        # if c == ',':
+            # line.append(''.join(buf))
+            # buf = []
+        # elif c == "'" or c == '"':
+            # assert len(buf) == 0
+            
+            # buf = list(read_until(it, c))
+            # while it.peek() not in ',\n':
+                # buf.append(c)
+                # buf.extend(read_until(it, c))
+        
+        # elif c == '\n':
+            # line.append(''.join(buf))
+            # lines.append(line)
+            # line = []
+            # buf = []
+
+        # else:
+            # buf.append(c)
+
+    # if buf:
+        # line.append(''.join(buf))
+    # if line:
+        # lines.append(line)
+    # del buf, line
+
+    # return lines[:-1] #get rid of crc
+
+
+# def read_until(iterator, end):
+    # for c in iterator:
+        # if c == end:
+            # break
+        # elif c == '\n':
+            # yield '\\n'
+        # else:
+            # yield c
+
+
+# output_table(lines)
+
+
+# for line in lines:
+    # line[3] = int(line[3], 16)
+
+
+# output_table((('"%s"' % bin(x[3])[2:].zfill(16)[::-1],) for x in lines))
+
+
+
+# set(len(line) - bitcount(line[3]) for line in lines)
+
+# es = Bag(es_)
+"""
+
+from util import Bag, gh_csv
+
+import json
+
+
+def load_enemy_skills(fname):
+    j = json.load(open(fname))
+    raw = j['enemy_skills']
+    
+    return gh_csv(raw).map(EnemySkill)
+#
+# bag = load_enemy_skills(fname)
+
+
+class EnemySkill:
+    
+    propnames = ['help', 'skp1', 'skp2', 'skp3', 'skp4', 'skp5', 'skp6', 'skp7', 'skp8', 'ratio', 'aip0', 'aip1', 'aip2', 'aip3', 'aip4']
+    all_propnames = 'id name type'.split() + propnames
+    
+    defaults = ['', 0, 0, 0, 0, 0, 0, 0, 0, 100, 100, 100, 10000, 0, 0]
+    properties = {name:i for i, name in enumerate(propnames)}
+    
+    
+    def __init__(self, raw):
+        self.raw = raw
+        self.id = int(raw[0])
+        self.name = raw[1]
+        self.type = int(raw[2])
+        
+        flags = int(raw[3], 16)
+        self.flags = [(flags & (1<<i)) != 0 for i in range(15)]
+        
+        
+        it = iter(raw[4:])
+        for i, (p, d) in enumerate(zip(self.propnames, self.defaults)):
+            if flags & (1<<i):
+                val = type(d)(next(it))
+            else:
+                val = d
+            setattr(self, p, val)
+        
+        # Make sure the iterator is exhausted
+        try:
+            next(it)
+        except StopIteration:
+            pass
+        else:
+            raise StopIteration
+    
+    
+    def to_row(self):
+        return [getattr(self, prop) for prop in self.all_propnames]
+    
+    
+    # def __getattr__(self, attr):
+        # if attr in self.properties:
+            # index = self.properties[attr]
+            # if self.flags & (1<<index):
+                # val = self.raw[
+                # setattr(self, attr, val)
+            # else:
+                # val = self.defaults[index]
+            # return val
+        # else:
+            # raise AttributeError('%r object has no attribute %r' % (type(self), attr))
+    def __repr__(self):
+        return self.name
+
+
+
+es = load_enemy_skills(r"download_enemy_skill_data 2015-12-22.json")

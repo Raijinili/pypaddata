@@ -1,0 +1,20 @@
+
+TODO:
+        - 
+
+
+== [TODO] New versions ==
+    There must be a better way to update versions.
+
+
+TRY:
+    - Find the version barriers:
+        - Use the latest of the old version and the earliest of the new version.
+        ! This could be in metadata.
+        - Write a function that finds the gap.
+    - Detect where awakenings are by taking old collabs which will never come back.
+        - If they moved, we know where the additions were.
+        - If new things are after them, we know where the additions were.
+    - Can align by type, too.
+    - Can check for i where cards0[:i] != cards1[:i].
+

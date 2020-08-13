@@ -1,0 +1,117 @@
+clear_dungeon
+
+request:
+    - Args:
+        - pid: /\d{9}/
+            playerid
+        - sid: ?/\w{40}/
+            sessionid
+        - hash:
+            ??
+        - tmd: 
+            time in dungeon??
+        - nxc:
+            ??
+        - dung:
+        - floor:
+        - v: =? 2
+        - c:
+            Don't know. Got values of 457-700, but also 3 (only twice though).
+        - r: /\d{3}/
+            App version, as a 3-digit num.
+        - m: =? 0
+        - key: ghkey
+    - Sample:
+        """/api.php?action=clear_dungeon&pid={PID}&sid={SID}&hash={HASH}&tmd={}&nxc={}&dung=2025&floor=2&v=2&c=694&r=870&m=0&key={}
+        e={ENCRYPTED_DATA:base64}"""
+    
+response:
+    {"res":0,"v":2,"lup":0,"expgain":92815,"coingain":145576,"goldgain":0,"exp":45187294,"coin":48784395,"gold":56,"nextfloors":[],"cards":[[25666,5454,8,1,0,1222,0,0,0,0,0],[25667,6818,8,1,0,648,0,0,0,0,0],[25668,6818,8,1,0,650,1,0,0,0,0],[25669,2940,6,1,0,646,0,0,1,0,0],[25670,75198,18,1,0,1848,0,0,1,0,0]]}
+    json:
+        res: int = 0 
+        v: int = 2(?)
+        lup: int (?bool)
+            (look for Exp of a Lifetime on a low-level account.)
+        expgain: int
+        coingain: int
+        goldgain: int
+            (magic stone)
+            Used when clearing?
+        exp, coin, gold: int
+            Updated values.
+        nextfloors: list
+            ??
+        cards: list[mon: list[int, 11]]
+            New cards.
+        [[25666, 5454, 8, 1, 0, 1222, 0, 0, 0, 0, 0],
+         [25667, 6818, 8, 1, 0, 648, 0, 0, 0, 0, 0],
+         [25668, 6818, 8, 1, 0, 650, 1, 0, 0, 0, 0],
+         [25669, 2940, 6, 1, 0, 646, 0, 0, 1, 0, 0],
+         [25670, 75198, 18, 1, 0, 1848, 0, 0, 1, 0, 0]]
+            mon: (seealso player_data's mon?)
+                0: CHR
+                1: xp?
+                2: level
+                3: ??
+                4: ??
+                5: 0?
+                6: species
+                7: HP+
+                8: ATK+
+                9: RCV+
+                10: latents?
+
+
+Sample: Clearing "Special Event Score Challenge!" with an S-rank.
+    {"res":0,"v":2,"lup":0,"expgain":85495,"coingain":223416,"goldgain":1,"exp":378983046,"coin":747053001,"gold":3,"mfp":0,"mmp":0,"fp":22913,"mp":1842044,"nextfloors":[],"cards":[[4294902278,41,1,1,0,518,0,0,0,0,0,0,0,0,0],[4294905555,24,1,1,0,3795,0,0,0,0,0,0,0,0,0],[4294905733,35,1,1,0,3973,0,0,0,0,0,0,0,0,0]],"awd":[[9923,194],[3795,4294905555],[3973,4294905733],[9935,297]],"rrk":4,"pcards":[[23061,1176938,68,6,2,1918,0,0,1,3,0,51984,0,0,0],[49247,15598526,102,6,4,5019,99,99,99,9,0,40599,0,45,0]],"plpgain":0,"plp":14970}
+
+    - Breakdown:
+        res: 0
+        v: 2
+        lup: 0
+        expgain: 85495
+        coingain: 223416
+        goldgain: 1
+            Magic stones gained.
+        exp: 378983046
+            Current XP
+        coin: 747053001
+            Current coins
+        gold: 3
+            Current stones.
+        mfp: 0
+            Multiplayer-gained FP
+        mmp: 0
+            Multiplayer-gained MP
+        fp: 22913
+            Current FP
+        mp: 1842044
+            Current MP
+        nextfloors: []
+        cards: Drops.
+            - [4294902278, 41, 1, 1, 0, 518, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                - Lil Blue
+            - [4294905555, 24, 1, 1, 0, 3795, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                - Tri-God Mask
+            - [4294905733, 35, 1, 1, 0, 3973, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                - Super Snowglobe
+        awd: S-rank gains.
+            - [9923, 194]
+                - Roll machine 194 (mail)
+            - [3795, 4294905555]
+                - Tri-god Mask
+            - [3973, 4294905733]
+                - Super Snowglobe
+            - [9935, 297]
+                - +297 points (mail)
+        rrk: 4
+            - Ranking rank?: S.
+        pcards: Player Card updates.
+            - [23061, 1176938, 68, 6, 2, 1918, 0, 0, 1, 3, 0, 51984, 0, 0, 0]
+            - [49247, 15598526, 102, 6, 4, 5019, 99, 99, 99, 9, 0, 40599, 0, 45, 0]
+        plpgain: 0
+            - Pluspoint gains.
+        plp: 14970
+            - Current plusses.
+
+

@@ -1,0 +1,698 @@
+download_skill_data
+    res: 0
+    skill: list[$skl]
+        $skl:
+            name: str
+                - Invalid names:
+                    - ''
+                    - '????'
+                    - '*****'
+                    - nashi: "\u7121\u3057"
+                        = "無し"
+                    - <[in EN] Anything not ascii>.
+                        - E.g.:
+                            - 4368: （仮）
+                        - Anti-E.g.:
+                            - 4293: Mug Mug-♪
+                                = '\u266a'
+                    - (ASCII counterexamples):
+                        - 4322: Debug＿Taiko Combo
+                        - 3163: _＿Don Double!
+
+
+            help: str
+            sktp: int
+                skill type
+            skp1-8: int (all optional)
+                - If not provided, it's 0.
+            lcap: int
+                max level
+            ctbs: int
+                skill turns
+            ctel: {-1, 0}
+                -1: Active skill.
+                0:  Leader skill.
+                
+    ckey: int
+        ??
+
+Version history:
+    0:  Original
+    1220:
+        - .skill is still an array, but each skill is its own array.
+        ? Are leader skills now the ones with levelcap 0?
+        - Indices and defaults:
+            [0]  .name: str = ""
+            [1]  .help: str = ""
+            [2]  .sktp: int = 
+            [3]  .lcap: int
+            [4]  .ctbs: int
+            [5]  .?? = ""
+                .ctel is missing, but it's an int.
+            [6]  .skp1 = 0
+            [7]  .skp2
+            [8]  .skp3
+            [9]  .skp4
+            [10] .skp5
+            [11] .skp6
+            [12] .skp7
+            [13] .skp8
+        ! Shortest array is 6.
+
+
+Tofind:
+    - 
+
+- Finding skilltype:
+    - Spreadsheeting:
+        - Sort:
+            - ctel
+            - sktp
+    - I should generate a list of all skilltypes and the params used.
+    ! Some skills just refer to other skills!
+        - Means that some named skills should be considered when typing.
+        - Names are not always significant!
+
+
+Active Skill types:
+    0   Damage = multiple of attack to All.
+        p1: Element
+        p2: Damage, % of attack.
+            - E.g. 300 -> 3x.
+    1   Fixed damage to all.
+        p1: Element
+        p2: Damage.
+    2   Damage = multiple of attack to one.
+        p1: Multiplier%.
+        p2: ?Max multiplier?
+            ^ Unused by any EN skill.
+    3   Reduce damage.
+        p1: Turns.
+        p2: % reduced.
+    4   Poison.
+        p1: % atk.
+    5   CtW.
+        p1: Number of seconds.
+    6   Gravity.
+        p1: % gravity.
+    7   Recover xRCV.
+        p1: % rcv.
+    8   Recover fixed.
+        p1: HP.
+    9   Orb change.
+        p1: elem from
+        p2: elem to
+    10  Shuffle.
+    
+    ...
+    
+    18  Delay.
+        p1: Turns.
+        p2: Max turns? (Used only for #1650, but useless.)
+        -` assert p2 == 0 or p2 == p1.
+    19  Defense break.
+        p1: Turns.
+        p2: % reduced.
+    20  Double orb change.
+        p1: ele, from1
+        p2: ele, to1
+        p3: ele, from2
+        p4: ele, to2
+    21  Reduce elemental damage.
+        p1: Turns.
+        p2: Element.
+        p3: % reduced.
+        - Use "Void" for p3=100.
+            - Nothing has p3<100.
+    
+    ...
+    
+    35  Drain.
+        p1: % of atk.
+        p2: % heal, of damage.
+    ...
+    37  Damage one enemy? (What about sktp=2?)
+        p1: Element.
+        p2: % of atk.
+    
+    ...
+    
+    42  Fixed racist attack.
+        p1: Targeted attribute.
+        p2: Damage attribute.
+        p3: Damage.
+    
+    ...
+    
+    50  Damage increase for attribute.
+        p1: Turns.
+        p2: Att.
+        p3: % multiplier.
+    51  Buff: Mass attack.
+        p1: Turns.
+    52  Enhance orbs.
+        p1: Attribute.
+        p2: ??
+            - Usually =6.
+            - But =100 for skill 188, "Enhance heal orbs".
+    ...
+    55  Fixed nonelemental piercing damage to one.
+        p2: Damage.
+    56  Fixed nonelemental piercing damage to all.
+        p1: Damage.
+    ...
+    58  Random elemental damage, all.
+        p1: Element.
+        p2: Min atk%.
+        p3: Max atk%.
+    59  Random elemental damage, one.
+        p1: Element.
+        p2: Min atk%.
+        p3: Max atk%.
+    60  Counterattack.
+        p1: Turns.
+        p2: Damage%.
+        p3: Element.
+    
+    ...
+    
+    71  Board change.
+        p: List of elements, ending with -1.
+        - Might want to sort this list in desc.
+    
+    ...
+    
+    84  ? xAtk damage to one, and HP falls to 1?
+        p1: Element.
+        p2: Min atk%?
+        p3: Max atk%?
+            - Equal to p2 in all known cases.
+        ! This is why I should have a column for "Skill used in <this combo>".
+    85  ? xAtk damage to all, and HP falls to 1?
+        p1: Element.
+        p2: Min atk%?
+        p3: Max atk%?
+            - Equal to p2 in all known cases.
+    86  ? Fixed damage to all?
+        - Only used for skill 2757.
+    87  ? Fixed damage to all?
+        - Only used for skill 2185.
+    88  Typed damage enhance.
+        p1: Turns.
+        p2: Type.
+        P3: Multiplier%.
+    ...
+    90  Double attribute damage enhance.
+        p1: Turns.
+        p2: Att1.
+        p3: Att2.
+        p4: Mult%.
+    91  Double orb enhance.
+        p1: Elem 1.
+        p2: Elem 2.
+        p3: =6?
+    92  ? Some multipler.
+        p1:
+        p2:
+        p3:
+        p4:
+    93  Switch with leader.
+    
+    ...
+    
+    99  Joker's Killing Joke.
+        p1: =1
+    
+    ...
+    
+    110 Grudge Strike (Mass).
+        p1: ?
+            Usually 0, but 1 for skill 3561.
+        p2: Element.
+        p3: Min mult%.
+        p4: Max mult%.
+        p5: ? Some multiplier?
+            ? Scaling?
+    
+    ...
+    
+    115 Drain.
+        ? Again? What about sktp=35?
+        p1: Element.
+        p2: Atk%.
+        p3: Heal dmg%.
+    116 Skill combo:
+        p1: First skill.
+        P2: Second skill.
+    117 Heal and cure bind.
+        p1: Binding cured.
+        p2: HP recovered = RCV%.
+        p3: HP recovered (fixed).
+        p4: HP% recovered.
+        - Any can be 0, including bindcure.
+        - Assumption: Only one of p2-4 are nonzero.
+    118 Activate random skill.
+        p: List of skills.
+            - Either ends with 0, or just list nonzero.
+    
+    ...
+    
+    126 Skyfall chance.
+        p1: Element flags.
+        p2: Turns.
+        p3: Max turns?
+            = p2.
+        p4: Increased chance.
+            ? Is it really increased chance? Or increased relative chance?
+                - E.g. In a tricolor dungeon, is it "15% dark" or "15/115 dark"?
+    127 Column change.
+        p1: Position flags.
+            - Left column: 1 = 1<<0.
+            - Right column: 32 = 1<<5.
+            ! On 7x6 and 5x4, they are reinterpreted to be relative to closest edge, so that the descriptions are still true.
+        p2: Element flags.
+        p3: Position flags 2?
+        p4: Element flags 2?
+        ? Can have more?
+    128 Row change.
+        p1: Position flags.
+            - Top row: 1 = 1<<0.
+            - Bottom row: 16 = 1<<4.
+        p2: Element flags.
+        p3: Position flags 2?
+        p4: Element flags 2?
+        ? Can have more?
+    
+    ...
+    
+    132 ??
+        p1: Element?
+        p2: % of ??
+            - Optional.
+            - Possibly negative.
+        p3: % of ??
+            - Optional.
+    
+    ...
+    
+    140 Orb enhance, flags.
+        p1: Elem flags.
+        p2: =6?
+    141 Single-color orb spawn.
+        p1: Number of orbs.
+        p2: Elem flags, orbs spawned.
+        p3: Elem flags, orbs not replaced.
+        -` assert p2&p3 == p2
+            - Fails for skill 2165.
+                - Part of sk1850 Encouraging Reward, which spawns poison orbs.
+                ^? Does that mean poison orbs can replace poison orbs?
+    142 ??
+        p1: 
+        p2: 
+            - Optional.
+    ...
+    144 Weirdo team attribute attack thing.
+        p1: Eleflags, the elements involved in the attack.
+        p2: Multiplier%.
+        p3: 0 if mass, 1 if single?
+        p4: Damage element.
+    145 ??
+        p1: %?
+    146 Haste?
+        p1: Min.
+        p2: Max?
+        -` assert p2 == p1
+    
+    ...
+    
+    152 ??
+        p1: ??-flags.
+        p2: =99?
+    153 Elemental Jammer.
+        p1: elem, to.
+        p2: =1?
+    154 ??
+        p1: ??-flags.
+        p2:
+    ...
+    156 Awskill-based damage enhance.
+        p1: Turns
+        p2: Aw0
+        p3: Aw1
+        p4: Aw2
+        p5: =2?
+        p6: Mult%.
+            - Not `15`, but `115`.
+
+Leader Skill types:
+    0   Nothing?
+    
+    ...
+    
+    11  Attribute atk mult.
+        p1: Att.
+        p2: Atk%.
+    12  Burn. (E.g. Hino's LS.)
+        p1: Atk%.
+    13  Autoheal.
+        p1: Rcv%.
+    14  Resolve.
+        p1: Threshold%.
+        p2: Chance%.
+            =100.
+    15  Extra time.
+        p1: Centiseconds.
+    16  Reduce damage.
+        p1: Reduce%.
+    17  Elemental reduction.
+        p1: Element.
+        p2: Reduce%.
+    
+    ...
+    
+    22  Type-based xAtk.
+        p1: Type.
+        p2: Atk%.
+        ! I can use these to determine type indices!
+    23  Type-based xHP.
+        p1: Type.
+        p2: HP%.
+    24  Type-based xRCV.
+        p1: Type.
+        p2: RCV%.
+    ...
+    26  xAtk all.
+        ? Are there any monsters with these skills>
+        p1: ATK%.
+    ...
+    28  Att-based xATK and xRCV.
+        p1: Att.
+        p2: Mult%.
+    29  Att-based xALL.
+        p1: Att.
+        p2: Mult%.
+    30  2-Type-based xHP.
+        p1: Type 1.
+        p2: Type 2.
+        p3: Mult%.
+    31  2-Type-based xATK.
+        p1: Type 1.
+        p2: Type 2.
+        p3: Mult%.
+    32  ? 2-Type-based xRCV.
+        - Speculated.
+            = No skills with this type.
+        p1: Type 1.
+        p2: Type 2.
+        p3: Mult%.
+    33  Drumming sound.
+    
+    ...
+    
+    36  Reduce damage from two Atts.
+        p1: Att1.
+        p2: Att2.
+        p3: Reduce%.
+    ...
+    38  Reduce damage under HP threshold.
+        p1: Threshold%.
+        p2: Chance%?
+            =100
+        p3: Reduce%.
+    39  Increase two stats(?) when under HP threshold.
+        p1: Threshold%.
+        p2: Stat1.
+            - 1 for Atk, 2 for RCV, 0 for none.
+        p3: Stat2.
+        p4: Mult%.
+    40  2-Att-based xATK.
+        p1: Att 1.
+        p2: Att 2.
+        p3: Mult%.
+    41  Counterattack.
+        p1: Chance%.
+        p2: Dmg%.
+        p3: Element.
+    ...
+    43  Reduce damage when within HP% range.
+        p1: min hp%?
+        p2: max hp%?
+        p3: Reduce%.
+    44  xATK when HP >= threshold.
+        ? Or "xStats when HP is full"/
+        p1: Threshold%.
+        p2: Stat 1?
+        p3: Stat 2?
+        p4: Mult%.
+    45  Att-based xHP and xAtk.
+        p1: Att.
+        p2: Mult%.
+    46  2-Att-based xHP.
+        p1: Att1.
+        p2: Att2.
+        p3: Mult%.
+    ...
+    48  Att-based xHP.
+        p1: Att.
+        p2: Mult%.
+    49  Att-based xRCV.
+        p1: Att.
+        p2: Mult%.
+    
+    ...
+    
+    54  Coin drop mult.
+        p1: Mult%.
+    
+    ...
+    
+    61  Match colors for Atk mult.
+        p1: att flags.
+        p2: Required colors.
+        p3: Atk%.
+        p4: +Atk% per extra color.
+        p5: ??
+    62  Type-based xHP & xATK.
+        p1: Type.
+        p2: Mult%.
+    63  Type-based xHP & xRCV.
+        p1: Type.
+        p2: Mult%.
+    64  Type-based xATK & xRCV.
+        p1: Type.
+        p2: Mult%.
+    65  Type-based xALL.
+        p1: Type.
+        p2: Mult%.
+    66  Combo-based xAtk.
+        p1: Min combos.
+        p2: Mult%.
+    67  Att-based xHP & xRCV.
+        p1: Att.
+        p2: Mult%.
+    ...
+    69  Att- and Type-based xAtk.
+        p1: Att.
+        p2: Type.
+        p3: Mult%.
+    
+    ...
+    
+    73  Att- and Type-based xHP & xATK.
+        p1: Att.
+        p2: Type.
+        p3: Mult%.
+    ...
+    75  Att- and Type-based xAtk & xRCV.
+        p1: Att.
+        p2: Type.
+        p3: Mult%.
+    76  Att- and Type-based xALL.
+        p1: Att.
+        p2: Type.
+        p3: Mult%.
+    77  2-Type-based xHP & xATK.
+        p1: Type 1.
+        p2: Type 2.
+        p3: Mult%.
+    ...
+    79  2-Type-based xATK & xRCV.
+        p1: Type 1.
+        p2: Type 2.
+        p3: Mult%.
+    
+    ...
+    
+    89  ??
+        p1: ??% =100?
+    
+    ...
+    
+    94  Att-based xATK when HP <= threshold.
+        ? Is it really "<=" instead of "<"?
+        ? xListedStats rather than xATK?
+        p1: Threshold%.
+        p2: Att.
+        p3: =1?
+            ? Stat 1?
+        p4: =0?
+            ? Stat 2?
+        p5: ATK%.
+    95  Type-based xATK when HP <= threshold.
+        ? Is it really "<=" instead of "<"?
+        ? xListedStats rather than xATK?
+        p1: Threshold%.
+        p2: Type.
+        p3: =1?
+            ? Stat 1?
+        p4: =0?
+            ? Stat 2?
+        p5: ATK%.
+    96  Att-based xATK when HP >= threshold.
+        ? xListedStats rather than xATK?
+        p1: Threshold%.
+        p2: Att.
+        p3: =1?
+            ? Stat 1?
+        p4: =0?
+            ? Stat 2?
+        p5: ATK%.
+    97  Type-based xATK when HP >= threshold.
+        ? xListedStats rather than xATK?
+        p1: Threshold%.
+        p2: Type.
+        p3: =1?
+            ? Stat 1?
+        p4: =0?
+            ? Stat 2?
+        p5: ATK%.
+    98  Combo-based xATK, with +xAtk for more combos.
+        p1: Min combos.
+        p2: Mult%.
+        p3: +Mult%.
+        p4: Max combos.
+    ...
+    100 Mult when skill is used.
+        p1: Stat 1.
+        p2: Stat 2.
+        p3: Mult%.
+    101 Exact combos for multiplier.
+        p1: Combos.
+        p2: Mult%.
+    
+    ...
+    
+    104 Combo-based att-based xAtk.
+        p1: Min combos.
+        p2: Att flags.
+        p3: Stat 1?
+            = 1
+        p4: Stat 2?
+            = 0
+        p5: Mult%.
+    105 xATK and xRCV to all.
+        - Used to reduce RCV.
+        p1: RCV%.
+        p2: ATK%.
+    
+    ...
+    
+    107 ??
+        p1: ??% = 75?
+    108 xHP to all, xATK to type.
+        - Used to reduce HP.
+        p1: HP%.
+        p2: Type.
+        p3: Atk% for type.
+    
+    ...
+    
+    111 xHP and xAtk to two Atts.
+        p1: Att 1.
+        p2: Att 2.
+        p3: Mult%.
+    
+    ...
+    
+    114 xALL to two Atts.
+        p1: Att 1.
+        p2: Att 2.
+        p3: Mult%.
+    
+    ...
+    
+    119 xATK when linking many orbs.
+        p1: Att flags.
+        p2: Min linked.
+        p3: Mult%.
+        p4: +Mult% for additional linked.
+        p5: Max linked (or 0).
+    
+    ...
+    
+    121 
+        ...
+    
+    ...
+    
+    138 Combine two LS.
+    
+    
+
+
+## Mandatory: ('name', 'help', 'sktp', 'lcap', 'ctbs', 'ctel')
+## Optional: ('skp1', 'skp2', 'skp3', 'skp4', 'skp5', 'skp6', 'skp7', 'skp8')
+## Code:
+##  def capcup(sets):
+##      ## Things in all, things ONLY in some.
+##      sets = map(set, sets)
+##      first = next(sets)
+##      cap = set(first)
+##      cup = set(first)
+##      for s in sets:
+##          cap.intersection_update(s)
+##          cup.update(s)
+##      return cap, cup - cap
+##  
+##  
+##  cap, cup = lowhigh(map(dict.keys, skHT))
+##  
+
+
+## Output into table:
+# rskills = json.loads(bah[0])['skill']
+skillkeys = ('name', 'help', 'sktp', 'lcap', 'ctbs', 'ctel', 'skp1', 'skp2', 'skp3', 'skp4', 'skp5', 'skp6', 'skp7', 'skp8')
+def skillparam(rskill, k):
+    val = rskill.get(k, '')
+    val = str(val)
+    val = val.replace('\n', '\\n')
+    return val
+import codecs
+def dump_skills(bah):
+    rskills = json.loads(bah[0])['skill']
+    with codecs.open('temp.out', 'w', 'utf-8') as f:
+        for i, rskill in enumerate(rskills):
+            print(i, *(skillparam(rskill, k) for k in skillkeys), sep='\t', file=f)
+dump_skills(bah)
+
+
+
+
+
+#########################
+# Skill categorization.
+#########################
+
+## Bucketize based on 'ctel', then 'sktp'.
+from util import bucketize
+
+bucketize(en.skills, Skill.isactive)
+
+
+
+
+
+
+
+
+

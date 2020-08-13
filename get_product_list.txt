@@ -1,0 +1,39 @@
+Magic Stone Shop.
+
+Request:
+    /api.php?action=get_product_list&pid={PID}&sid={SID}&tier=2&r=1820&m=0&key={KEY}
+
+Response:
+    res: =0
+    items: list[ShopItem]
+    &ShopItem:
+        name: :str
+            - Message
+        code: :str
+            - E.g. "jp.gungho.paden.padstonecampaign023_010"
+        price: :str
+            - E.g. "$9.99 (USD)"
+        bmsg?: buymessage? :str
+            - If it exists, there's an extra popup when you press the button, and this string is used to build that.
+                - Title
+                - Desc
+                - "See here for details":
+                - "Lineup"
+            - Pipe-delimited parts:
+                - Title: "^BF1238^Special One-Time Bargain Set^FFFFFF^"
+                - Description: "\nOnly 1 Special Bargain Set\nmay be purchased per account.\nIn addition to 10 Magic Stones\nand access to an exclusive Egg Machine,\nit provides bonus Pal Points."
+                - URL for "See here for details": https://bit.ly/2UeJ4cq
+                - URL for "Lineup": ihttps://ssl-na.padsv.gungho.jp/gacha_lineup/bonus_prop.php?pid=@ID@&sid=@SI@&pbi_id=181
+        spc?: isSpecial :int
+            - E.g. 1
+            - Default 0, I guess.
+        stone: int | str
+            - E.g. 85, "10"
+            - int for old, str for new.
+        buyable: =1?
+            - Not sure if buying changes this.
+        priceint
+        price
+        - There are two witnessed arg orders [2020-03-26]:
+            name code price bmsg spc stone buyable price_num
+            name code price bmsg price_num price_int stone buyable

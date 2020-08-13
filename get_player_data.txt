@@ -1,0 +1,460 @@
+get_player_data:
+    res: 0
+    friendMax: int
+    friends: list[friend]
+    card: list[boxcard]:
+        &boxcard: list[int, 14]
+            0   chr
+            1   xp
+            2   lv
+            3   slv
+            4   fuses
+                number of times Power Up Fusion used
+                not number of monsters fed to it
+                (does evolution/uevo count?)
+            5   id: index[cards]
+            6   plushp
+            7   plusatk
+            8   plusrcv
+            9   tamas
+                - Name ".tamas" allows ".awakenings" for species.
+            10  latents
+                - Packed bits. First four bits are the latent max?
+            11  inherit : CHR
+            12  extraplus
+                - For super awakening.
+            13  sawkn : awkns
+                - Current super awakening.
+        # Since 14.1: stacked evo mats.
+            0   chr = id + 0xFFFF0000
+            1   count
+            2   lv = 1
+            3   slv = 1
+            4   fuses = 0
+            5   id: index[cards]
+            6*  rest* = 0
+    ndun: list[list<int, 3>*]
+        Dungeons completed?
+        [0] : dungeon
+        [1] : floor
+        [2] : ??
+                challenge mode?
+    msg: ghmsg
+        Today's message.
+        &ghmsg :< str
+            Uses `^xxxxxx^` for switching color code.
+    omsg: ghmsg
+        Marquee message.
+    msg2datepd: ghtime
+        Date for tomorrow's message.
+    msg2: ghmsg
+        Tomorrow's message.
+    omsg2: ghmsg
+    gmsg: ghmsg
+        egg machine message
+    gms2gdatepd: ghtime
+            (^Not my typo.)
+        Gacha message 2 date (of replacement?).
+    gmsg2: ghmsg
+        Gacha message.
+    egatya: list[gacha*]
+        Extra Gacha?
+        - Older.
+        (Sometimes empty.)
+    egatya3: list<list<gacha>, 4>
+        - Newer: 1300 and up.
+        - First entry might always be empty.
+        gacha: object
+            name: ColorString
+            help: ColorString
+                Description
+            bs: ColorString
+                Short desc.
+            start: ghtime
+            end: ghtime
+            pri: int
+                Price.
+            ptp: =0?
+                Price type?
+                0: Magic stones
+                1: Pal Points
+            row: int
+                - 36 for shinra
+                - Corresponds to the `grow` param.
+            col: str (hex?)
+                Color?
+                "f20a15" for shinra
+            type: int
+                - Doesn't correspond to the `gtype` param.
+                - 20 for shinra
+    dcnt: list<int, 8?>
+        ??
+        %- Data counts for the strings?
+            - Nope.
+        - Datacounts for other things to request?
+            - E.g. _1 might be for mail.
+                - Which is weird, because there's the "mails" key for that.
+        ?- Version counts for `upload_data` and `download_data`.
+    mails: int
+        Number of mails.
+    pback: int =? 0
+        ??
+    lstreaks: int
+            Login streak.
+            - Max 7.
+            ?- Range 1-7.
+    logins: int
+        Number of login days. (NOT number of logins.)
+    litems: list[$bonus]
+        $bonus:
+            bonus_id: int
+                see `demail.py`
+            amount: int
+                see `demail.py`
+    litemT: `null`
+        ??
+        login item type?
+    cver: int
+        ? card_data version?
+        151
+        166
+    sver: int
+        ? skill_data version?
+        141
+        151
+    dver: int
+        ? dungeon_data version?
+        154
+        169
+    pver: int
+        ? limited_bonus_data version??
+        443
+        503
+    msver: int
+        ? enemy_skill version?
+        149
+        159
+    dsver: int
+        ? dungeon sale version?
+        33
+        51
+    psver: int
+        ? (monster) point shop version?
+        12
+        22
+    #new:
+    alver: int
+        Quests data (dl_al) version
+    cardMax: int
+        box space
+    name: str
+        playername
+    lv: int
+        rank
+    exp: int
+    camp: int (bool?)
+        ??
+    cost: int
+        team cost
+    sta: int
+        current stamina
+    sta_max: int
+    sta_time: ghtime
+        Time at which stamina is full?
+    gold: int
+        Magic Stones
+    coin: int
+    mp: int
+    max_decks: int
+        ??
+        Says 6 when I have 10.
+    curDeck: int
+        (0-based) index of current deck.
+    decks: list[$deck]
+        $deck: dict
+            set_##: list<int, 5>
+                Each element is the chr of the monster.
+    deck: str
+        Just a comma-delimited string of the current deck.
+        (What happens with empty slots? Are they left out or are they set to 0?)
+    ldeck: `null`
+        ??
+    fripnt: int
+        pal points
+    fp_by_frd: int
+        Points gained from friends
+    fp_by_non_frd: int
+        Points gained from non-friends
+    fripntadd: int
+        Palpoints gained since last check?
+    pbflg: int
+        ??
+        NOT whether or not you got palpoints.
+    curLvExp: int
+        Total XP for this rank.
+    nextLvExp: int
+        Total XP for next rank.
+    sr: int
+        ??
+        5 in all my saved files so far
+    cs: str
+        ??
+        "mr=400,mc=100,mt=180"
+        Doesn't exist in padherder2015-11-23.json
+        First exists in padherder2015-12-06.json
+    bf: int (bool?)
+        Whether you have a BF to use?
+    us: bitflags
+        User settings.
+        - See user_settings.txt.
+    caf: int
+        ??
+        32774 in padherder2015-05-04.json to padherder2015-06-02.json
+            2**15 + 6
+        6 in padherder2015-06-05.json to padherder2016-01-14.json
+    r: int
+        version (e.g. 852 is version 8.5.2)
+
+
+== Datatypes ==
+
+-- friend --
+
+! 12.6:
+    friend:< list[46||61]
+    +0  ??: int
+        = 11?
+        ? Size of the monster array?
+        ? Version?
+    +1  id
+    +2  name
+    +3  rank
+    +4  starter
+        1: Tyrra
+        2: Plessie
+        3: Brachy
+    +5  last seen: gh_time
+    +6  friends?
+    +7  maxfriends?
+    +8  ??: int
+        ?= 6-8
+        - Seems to equal 5 + .starter.
+    +9  ??: int=1
+    +10 ??: int=0
+    +11 ??: int=0
+    +12 ??: int=0
+    +13 ??: int=0
+    +14 isbestfriend: bool
+    +15 crowns: int
+        ? Actually crown display? \g's 4 is shown to me as 3.
+    +16 *mon1: friendcard: list[15]
+        - Green square
+        - Non-friend leader.
+    +31 *mon2
+        - Red circle
+        - Even shows up for nonfriends.
+    +46 *mon3 (if bestfriend)
+        - Blue triangle
+    friendcard: list[15]
+    +0  monid: bookcard.id
+    +1  lv
+    +2  slv
+    +3  +hp
+    +4  +atk
+    +5  +rcv
+    +6  tamas
+    +7  latents
+    +8  *inherit: friendinherit:< list[8]
+        +0  monid: bookcard.id
+            ! Player inherit is by CHR.
+        +1  slv
+        +2  lv
+            No effect if not same-att.
+        +3  is297
+            Doesn't show in-game if not same-att.
+        +4  tamas
+    +13 saplus
+    +14 sawkn
+
+! One of these may be "reject friend request/mail".
+
+! [jp v13] \g's sample data has a few different values:
+        [11,317691407,"\\g",901,2,"180309011216",131,135,4,8,64,1,134,1,0,3,3337,99,5,99,99,99,9,15517301190,4077,3,99,0,9,0,0,4020,99,6,99,99,99,9,6096082614,0,0,0,0,0,0,0
+    - [8] is 2+starter, instead of 5+starter.
+        ? Region?
+    - [9:14] == 8,64,1,134 instead of 1,0,0,0,0
+
+---
+
+! [8.8.0] At this version or earlier:
+        - New int (bool?) inserted at [15]. It's now (32 || 40).
+        - [0] is now 6.
+        
+    &friend:< list[31 || 39]:
+        0   5?: int
+        1   name: str
+        2   id: int
+            Not the exposed ID.
+        3   rank: int
+        4   starter: int
+            1: Tyrra
+            2: Plessie
+            3: Brachy
+        5   last seen: gh_time
+        6   friends?
+        7   maxfriends?
+        8   ??: int
+            6-8
+        9   ??: int=1
+        10  ??: int=0
+        11  ??: int=0
+        12  ??: int=0
+        13  ??: int=0
+        14  isbestfriend: bool
+        15  monid: index[cards]
+            lv
+            slv
+            +hp
+            +atk
+            +rcv
+            awakenings
+            latents
+        23-30 mon2
+        31-38 mon3 (if bestfriend)
+% An older(?) spec.
+    &friend:< list[31 || 39]:
+        - ord?
+        - trueID?
+        - name
+        - rank
+        - ??
+        - last_played
+        - ??
+        - ??
+        - ??
+        - ??
+        - ??
+        - ??
+        - ??
+        - ??
+        - ??
+        {2,3}(
+            - monster
+            - lv
+            - slv
+            - +hp
+            - +atk
+            - +rcv
+            - awakenings
+            - 0
+        )
+
+
+
+
+===
+
+#####
+
+Unknowns:
+    litemT
+    dcnt
+    
+    pback
+    
+    cver
+    sver
+    dver
+    pver
+    msver
+    dsver
+    psver
+    
+    ldeck
+    
+    pbflg
+    
+    sr
+    cs
+    bf
+    us
+    caf
+
+
+#####
+
+Things to look for:
+    - Cleared dungeons
+    - Can has coin dungeons?
+    - Can has technicals?
+    - Present Egg available.
+    %- Favorite monsters.
+    %- Favorite friends.
+    - Additional downloads (e.g. limited_bonus_data).
+
+#####
+
+
+== Event stuff ==
+Keys which are not per-player, but rather are talking about events.
+
+- msg
+- omsg
+- msg2datepd
+- msg2
+- omsg2
+- gmsg
+- gmsg2gdatepd
+- gmsg2
+- egatya
+
+
+
+
+===
+
+
+
+
+
+
+
+
+
+
+import json
+
+from codecs import open
+
+j = json.load(open('padherder2016-01-14.json', 'r', 'utf-8'))
+
+friends = j['friends']
+box = j['card']
+
+def minmax(iterable, key=None):
+    if key is None:
+        keys = list(iterable)
+    else:
+        keys = [key(x) for x in iterable]
+    return min(keys), max(keys)
+
+minmax(friends, len)
+minmax(box, len)
+
+
+output_table(box)
+
+
+# Prints monsters that have higher skill level than the maximum.
+# Params:
+#   box = get_player_data['card']
+#   cards = download_card_data['card']
+#   skills = download_skill_data['skill']
+for mon in box:
+    card = cards[mon[5]]
+    skill = skills[card[24]]
+    slv = mon[3]
+    if slv > 1 and slv > skill['lcap']:
+        print(card[0], slv, skill['lcap'])
+
+

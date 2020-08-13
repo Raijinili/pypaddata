@@ -1,0 +1,289 @@
+#- SPEC HISTORY:
+    #- Spec might've changed with the triple typing update.
+    #- Spec changed at some point to include ID.
+        #- Means array index isn't reliable anymore.
+
+#? Should I change the "unimplemented version" error to a warning?
+
+#see also: types.yml
+
+download_card_data:
+    card: list[Card]
+        Card: List[String and then ints/floats]
+        % 0-9
+            -. ID: int
+            -. name: str
+                - Can be "*****" or "????" for dummy.
+                - Can start with "*****".
+                    - E.g. "***** (HxH)".
+                - Can include non-ASCII characters.
+                    - E.g.:
+                        - 2367: Zoë Hange
+                            = "Zo\u00eb Hange"
+            -. Attr: int 0...5
+            -. Subattr:
+                -1 for None
+            -. isUlt: bool
+                not set for unreleased cards
+            -. type1: int
+            -. type2:
+                - -1 for None.
+            -. Rarity: int
+            -. Cost: int
+            -. Picture scale?: 0-5
+                
+        % 10-13
+            -. max lv: int
+            -. feedxp: int
+                At level 4.
+            -. ??:
+                1 for unreleased
+                100 for released
+            -. sell price: int
+                At level 10.
+        % 14-22
+            *9.
+              for HP, Atk, Rcv:
+                #. start: int
+                #. max: int
+                #. growth exponent: float
+        % 23-26
+            -. max XP: int
+            -. XP exponent: float
+            -. active: int -> skill_data[]
+            -. leader: int -> skill_data[]
+                - Generic gem: =10627
+                - Specific gem: =10628
+        % 27-36
+        + enemy data:
+            -. turns: int
+                Number of turns to act.
+                Turn cooldown.
+            *9. enemy stats
+              for HP, Atk, Def:
+                #. lv 1 stat
+                #. lv 10 stat
+                #. growth exponent: int
+        % 37-39
+            -. ??
+                0 for unreleased.
+                1 for:
+                    182 Poring
+                    183 Marin
+                    184 Poporing
+                    185 Drops
+                    186 Ghostring
+                    517 Present Egg
+                    518 Present Egg
+                    519 Present Egg
+                    ? What about the L/D Present Eggs?
+                10 for everything else.
+                    max level?
+                    level of the max e-stat?
+            -. coins (lv2)
+                Coins dropped in dungeon.
+            -. exp (lv2)
+                Rank XP dropped.
+        % 40
+        + evo:
+            -. Pre-evo: -> card[id]
+        % 41-50
+            *5.
+                evo mats to get to this.
+            *5.
+                evo mats to unult. (but it's filled in for everything?
+        % 51-56
+        + ??:
+            51.
+                - Seems like turncount. Again??
+            *5. ??
+                52 is some sort of bitflag thing.
+                    - Because it has values like 255, 511, 2047, 63.
+                    - Unless it's equal to 100.
+                    - [2020-01] Wait, now it's all 0s and 1s? 4718 zeroes and 2256 1s.
+                        ? "New AI" flag?
+                - It's _UNK53 now.
+            _UNK54:
+                =0,1,2,5,7?
+                2: Awoken Deus Ex Machina
+                5: Henry Boram and its evo.
+                7: Morning Sun Dragon Caller, Kanna
+            _UNK55:
+                =0,1,1000?
+            _UNK56:
+                =0?
+            ^ Did I miscount it? There are 6 here.
+        % 57
+        + enemy:
+            -. enemy_skills : Array[??, ??, ??]
+                (see below)
+                +0. enemy skill ID
+                318 = preemptive 1?
+                +1. ??
+                    
+                +2. chance: int 0...100
+                    sometimes a parameter
+        % 58
+        + more:
+            -. awkns : Array[-> awakens]
+        % 59  # Since 12.4.
+            -. sawkns : str
+                Super awakenings.
+                Comma-separated list of awakening IDs.
+                Not used until 12.5.
+        % 60-61  #? Since 8.1?
+            -. base
+                Base form.
+            -. gkey
+                Grouping key.
+                Used by Monster Book's "Sort -> Group" option.
+        % 62-64  # Since 8.1.
+        + new version
+            -. type3
+            -. MP
+            -. latent
+                = See `values.latents`.
+        % 65-66  # Since 9.0.
+            -. collab?
+                = See `padvalues.collabs`.
+            -. f_inherits
+                Inheritance flags
+                b[0]: "can inherit".
+                b[1]: "can take assist"
+                    - always on if the monster exists.
+                b[2]: ??
+                    - Superman/Batman skillups have it set.
+                    - Baby Match has it set.
+                    - Y'shtola and Lightning don't.
+                    - Everything that has it set is in a collab.
+                        ` if c.raw[-1] & 4 then c.raw[-2]
+                        ` (not c.raw[-1] & 4) or c.raw[-2]
+                        -> ` all((not c.raw[-1] & 4) or c.raw[-2] for c in values(en.cards))
+                    ^- Not vice versa.
+                b[3]: Unstackable (for evo/enhance/awaken).
+                b[4]: "Assist Only".
+                    - Can't be put on team.
+                    - Can't take latents or assists.
+                b[5]: Can take sixth Latent Slot.
+        % 67  # Since 12.2.
+            -. furigana
+                For 12.4's monster search feature (JP only).
+        % 68  # Since 12.3.
+            -. limit: int
+                Percentage stat increase at level 110.
+        % 69
+            -. voiceID
+            Usually 0.
+            Otherwise, each value is unique to a few monsters.
+        % 70  # Since 1600
+            default=0
+            -. orbskinID
+        % 71  # Since 1800
+            -. transformID : /link:\d+/ < str
+                default=''
+                - ID of the card this transforms into.
+
+Spec version history:
+    - 1800: ??
+    - 1600: Orb skin.
+    - 1250: Super Awakening.
+        = http://puzzledragonx.com/en/news.asp?nid=735
+        ! No apparent change in size!
+        ! The Super Awakening arrays have been filled.
+    - 1240: Pre-super awakenings.
+        = http://puzzledragonx.com/en/news.asp?nid=732
+        - Sadtama
+        - Inserts superawakening string after awakening array.
+    - 1230: Limit break
+        = http://puzzledragonx.com/en/news.asp?nid=724
+        - Sadpy
+    - 1220: Furigana
+        = http://puzzledragonx.com/en/news.asp?nid=711
+        ? Is the furigana for the v12.4 search?
+        - Assist/Pixel evo.
+    - 920: Now index is in slot 0.
+    - 900:
+        = http://puzzledragonx.com/en/news.asp?nid=500
+        ?- Collab
+        - Inherits
+    ##- 820:
+        = http://puzzledragonx.com/en/news.asp?nid=373
+        ! Don't have a sample of this. Jumps from 810 at 2016-05-20 to 900 at 2016-05-25. That means 810 was in use for 8.2.
+    - 810:
+        = http://puzzledragonx.com/en/news.asp?nid=350
+        - MP
+        - Latents
+        ?- Type3
+            ! Check if the pre-820 had third-type Sakuya.
+                - 8.1.1 was in NA on 2015-09-03, so check before 2015-10.
+        ?- Base and groupkey?
+            - It's when the beans were introduced, which made beans necessary.
+
+
+#
+Card unknowns:
+    ? isrem
+    ? enemy size
+    ? movesets
+        = sets of enemy moves.
+    ? enemy skill specifications
+    ?! isvalid
+        ! Dragon Ball (1558-) and HxH (1009-)  have invalid names but valid data, so there's probably no way.
+    ? Mark of Reincarnated/Pixel/Assist evo.
+    ? isassistevo
+        - As in, can unevolve.
+    ? 
+
+
+Unknown indices:
+        ^ Where `name` is 1.
+    9
+    12
+        %? Could .11 be "xp max level"?
+            = No. Max is 99.
+    37 - enemy "max" level?
+    51-56 - movesets?
+    65.2
+        - Now 66.2.
+
+
+enemy skills:
+    (id, arg1, arg2)
+    If id=10, the next id will be 12 (which has a 0 in second parameter?). I think this affects the skill below it.
+    
+
+
+
+
+
+
+
+
+
+
+== Unrelated to spading ==
+... but I still want this here for some reason.
+
+- XP curves:
+    - Wants:
+        + XP fodder help:
+            - Map an XP at a level to a curve.
+            - Map an XP at a level to lists of whatever.
+            - Optimal feeds.
+                - Input: One of:
+                    - species[, cur_lv]
+                    - curve(= min,max,growth), fodderXP(@ lv=4)[, cur_lv]
+                    ! If no "cur_lv", then it's "optimal total XP for the fodder".
+                        ! If no cur
+                - Output: a list of ranges of XP to feed.
+                    ?- A graph showing XP efficiency for each feed?
+                ? How to take coins into account?
+                ? How to account for Great/Super chance?
+    - 
+
+
+
+
+
+
+

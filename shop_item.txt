@@ -1,0 +1,40 @@
+action=shop_item
+
+request:
+        Sample: /api.php?action=shop_item&pid={PID}&sid={SID}&r=1820&m=0&key={KEY}
+    action: =shop_item
+    pid: 
+    sid: 
+    r: 
+    m: =0
+    key: 
+/api.php?
+    action=shop_item
+    &pid={PLAYER_ID}
+    &sid={SESSION_ID}
+    &r={REVISION}
+    &m=0
+    &key={KEY}
+
+
+response:
+    res: 0
+    v: 2
+    d: gh_csv
+
+
+There are two kinds of rows:
+- Rows starting with "T,".
+    - 6 items per row.
+- Rows starting with "P,"
+    - 7 items per row.
+    0. P
+    1. mon_id
+    2. MP cost
+    3. =1?
+    4. msg?
+    5. =0?
+    6. =0?
+
+
+

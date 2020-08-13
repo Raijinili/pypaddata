@@ -1,0 +1,89 @@
+Info about requests, and unsorted requests.
+
+
+<any>:
+    - Request: uriquery
+        action: Str
+        pid: ghPID :< int
+        sid: /\w{40}/
+            = Session ID.
+                ?- Base36?
+                ?- Base64?
+        <insert actual request stuff here>
+        r: int
+            = App version.
+        m: int =? 0
+            = ??
+        key: hex{8}
+            = ??
+
+
+
+composite_user_cards:
+    - Request: uriquery
+        action: ="composite_user_cards"
+        &pid 
+        &sid
+        base: ghCHR :< int
+            = Base monster.
+        /add[1-5]/: ghCHR :< int
+            = i'th monster being fed.
+            - Only sends as many indices as used.
+            - Starts from 1, even if feed slots have gaps.
+        &r
+        &m
+        &key
+    - Response: json
+        res: =0
+        slup: int
+        aexp: int
+            = Additional experience.
+        coin: int
+        bonus: int
+        rcard: BoxCard :< list[int]
+            
+            
+        dcuid: list[ghCHR :< int]
+            = The CHRs fed.
+
+
+action=save_decks:
+    - Request: uriquery
+        action:= "save_decks"
+        &pid 
+        &sid
+        curdeck: int
+            = Index of current deck.
+            - Starts at 0.
+        &r
+        &m
+        &key
+        decks: List[deck]
+            = Updated decks.
+            ! In the data portion of the request.
+            - "deck" := `{"set_%02d": List[5*CHR]}`
+                - Set number starts at 0.
+                - List of cards is 5 even with gaps.
+                    - Gaps are set to 0.
+            ? Looks like a hacky ordered dict.
+                = A list of one-pair dicts.
+
+    - Response: json
+        res: =0
+
+
+action=rec_qrw
+        "Receive quest reward"
+    - Request:
+        pid
+        sid
+        qid
+            99: Skill Boost badge
+        r
+        m
+        key
+    - Response: json
+        res: 0
+        mail: 0
+
+

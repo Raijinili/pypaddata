@@ -1,0 +1,39 @@
+
+== Metaspec ==
+
+- Specify properties in a class attribute, and have base class which generates them.
+    - `.properties` is a dict, mapping names to "what to do".
+        - Type-based handling:
+            - int: "Get it from the `.raw` array".
+                - Could instead use `operator.itemgetter`.
+            - callable: "Call on the object."
+            - (int, callable): "Get from the `.raw` array and call."
+            - (int, indexable): "Get from the `.raw` array, and getitem."
+                - Could pass in `dungeon.get` or `dungeon.__getitem__`.
+        ? Naming?
+            - .properties
+            - ._props
+            - ._attrs
+        ? Implementation which allows multiple "datetime" versions?
+            ? How do I delay determining which `dungeons` to use?
+    ? Should computed properties be cached?
+        - "Yes": For running multiple queries.
+        - "No": Easier to change how it's cached.
+    ? Alternatively: Map index to property name?
+- Specify unflattening.
+    - Must be done before end of initialization.
+        - Because then we have uniform .property manager.
+    - E.g.
+        - `Card`'s enemyskills and awakenings arrays.
+            ! There are two arrays to find, so the start of the second isn't fixed.
+        - `Friend`'s array of available monsters.
+    - Specify:
+        - How to tell where to cut out.
+            ? And actually cut it out, so that later array cuts can be absolute instead of relative?
+        |- Blocksizes:
+            - E.g. For cards, specify:
+                - 56 entries.
+                - array of ${next} entries of size 3.
+                - array of ${next} entries.
+                - 5 entries.
+        

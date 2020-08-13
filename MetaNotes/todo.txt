@@ -1,0 +1,98 @@
+TODO
+
+== Action analysis ==
+
+Need:
+    - Make it easier to load up all actions of a type.
+    - Lazy load actions.
+        - So that I can start working right away.
+    - [optm] Index (like with a database).
+        - For each action, have a list of files that have those actions.
+        - It won't help with common actions, but I've already analyzed most of the common actions.
+
+Each entry should have:
+    + PAD-specific info:
+        - Action.
+        - Player ID [pid].
+        - Session ID [sid].
+        - Version [r].
+        - [key].
+        - [res].
+    - Datetime.
+    - Request:
+        - Host
+        - Params
+        - Body
+    - Response:
+        - HTTP code.
+        - Type:
+            | None
+            | json
+            | 
+        - Raw
+        - Data
+    - Source file.
+
+
+Want to know, for each action type:
+    - Param analysis:
+        - What params.
+        - Param order.
+        + Per param:
+            - Whether it's optional.
+                ! Maybe it changed.
+            - What kind of values.
+        - 
+    - Response analysis:
+        - 
+        - 
+    - 
+#
+
+
+===
+
+
++ Data listing:
+        ^ How to output data in a readable manner.
+    + Ideas for Python implementation of the data classes:
+            ^ Gotta make things easier.
+            - E.g. "Card" "Monster" "Dungeon".
+        - See "dataclass.py" and its notes.
+    + Table:
+        - Tab-separated output, for spreadsheets.
+        - Spreadsheet output.
+
+
+
++ Stat-mining:
+    - Letter.
+        ? What is needed before I send it out?
+    + Box emulation.
+        - Edgecases:
+            - Failed connection (leading to relogin) but possibly successful action.
+                - E.g.:
+                    - Feeding.
+                    - Selling.
+                - Detection:
+                    - Compare resulting box data with current box, and expected box, to confirm action.
+                    ^- Except for unknowns.
+                        ! Only a few possible unknowns, so compute all of them?
+                            - XP: Good, Great, Super.
+                            - Skillup: 0-max.
+                ! If fail point is between proxy and client, we can detect the result anyway.
+                    ? So what is the point, really?
+                ! If it doesn't happen much, we don't need to worry about it.
+            - Some actions don't go through the proxy.
+                - E.g.:
+                    - You fed a monster we didn't know about.
+                ?- Just ask people to make sure to log in with the proxy on?
+    + Optimization:
+            - Proxy needs to work invisibly enough that people wouldn't mind having it on during speedfarming.
+        - Opt points:
+            - Speed.
+            - Memory, if app.
+            - Reliability.
+        ! Ask the proxy devs how we can optimize the proxy.
+
+

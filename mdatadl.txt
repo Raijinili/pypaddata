@@ -1,0 +1,56 @@
+
+
+json:
+    res: 0
+    v: 1
+        - As of NA/2020-01-14.
+    d: gh_csv
+        - No semicolons near start.
+
+d:
+    0. =A : str
+    1. ?? : int
+        ? ID?
+    2. order : int
+        Sorted by this index.
+    3. Tab?: 1-4
+    4. Species: card_id
+    5. Level: int
+        - Can be 100-110.
+    6. flags1: bitflags
+        - Usually =0.
+        - For token exchange, =3.
+        - &1 = Comes max skilled
+        - &2 = Comes max awoken
+        - 4+ Invalid: Neither maxed.
+    7. start: gh_time
+    8. end: gh_time
+    9. msgstart: gh_time
+    10. msgend: gh_time
+    11. msg: string
+        - Sleipnir has a message start/end but no message?
+    12. Fodder count: int
+    13. flags2: bitflags
+        - Usually 0.
+        - One-time Kamen Rider: 2
+        - Tama: 4 (multiexchange?)
+    *.  Fodder list: card_id
+
+
+
+https://docs.google.com/spreadsheets/d/15MR3IjDPLZYi3wCLD8K1E--MfSoqSmwQaKcJ6aHJqZ4/edit#gid=0
+
+
+== [py] Testing ==
+
+from util import *
+from padutil import gh_csv
+
+j = ojson_load('mdata.json')
+data = gh_csv(j['d'])
+
+with open('temp.out', 'w', encoding='utf8') as file:
+    for row in data:
+        print(*row, sep='\t', file=file)
+
+

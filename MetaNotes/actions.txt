@@ -1,0 +1,140 @@
+List of actions.
+
+
+
+
+actions:
+    + User:
+      + Account:
+        - signup
+        - login
+        - change_name
+
+      + Mail:
+        - send_user_mail
+        - get_user_mails
+        - get_user_mail
+        - delete_user_mail
+        - fav_user_mail
+
+      + Present egg:
+        - receive_thank_you_gift
+        - send_thank_you_gift
+
+      + Friends:
+        - request_friend
+        - accept_friend_request
+        - send_buddy
+        - quit_friend
+
+      + Box:
+        - composite_user_cards
+        - evolve_user_card
+        - sell_user_cards
+        - skill_fusion
+            = Inheritance.
+
+      + Dungeons:
+        - get_helpers
+        - get_recommended_helpers
+        - sneak_dungeon
+        - sneak_dungeon_ack
+        - clear_dungeon
+        - confirm_level_up
+
+      + Sync:
+        - save_decks
+        - get_player_data
+        - upload_data
+        - download_data
+
+      + Buy:
+        - shop_item
+        - get_dung_sale
+        - buy_dung
+        - buy_stamina
+        - expand_num_cards
+        - play_gacha_cnt
+
+      + /roll:
+        & sneak_dungeon
+        & play_gacha_cnt
+        & composite_user_cards
+        & get_recommended_helpers
+
+    + Semi:
+        - get_id_parameter
+        - get_ids_parameter
+
+    + Data:
+        & shop_item
+        & get_dung_sale
+        - download_card_data
+        - download_dungeon_data
+        - download_enemy_skill_data
+        - download_limited_bonus_data
+        - download_skill_data
+        & dl_al
+        - mdatadl
+            ? Trading post data download
+
+    + Multiplayer:
+        - mp_room_open
+        - mp_rmake_comp
+        - mp_rmake_pre
+        - mp_rrelease
+        - mp_getfriroom
+        - mp_rentry_pre
+        - mp_rre_make
+
+    + Quests:
+        - dl_al
+            Download quests
+            "DownLoad Achievement List"?
+        - get_al
+            ? Get satisfied Quests?
+        - rec_qrw
+            "Receive Quest Rewards"
+        - al_infoall
+            ?? List of achievement numbers?
+
+    + ???:
+        - rregist
+            Tournament score send ("Rank Register"?)
+
++ Unknown API calls for:
+    - Buying MP monster.
+    - Buying with money.
+    - Bestfriending.
+
+
+% Categorize by:
+    + User:
+        + account
+        + mail
+        + friends
+        + dungeons
+        + box
+        + buy
+        + sync:
+                ? Stuff like upload_data and download_data.
+        + /roll:
+                Requests server to roll RNG.
+                This is what we're interested in.
+            - sneak_dungeon
+            - composite_user_cards
+    + Semi: Non-user data but request only some.
+            E.g. get_id_params?
+    + Data: User-independent stuff.
+
+
+
+== Action spec ==
+    for actions not big enough to get their own file.
+
+rec_qrw:
+    type: json
+    data:
+        res: =0
+        mail: =?1
+

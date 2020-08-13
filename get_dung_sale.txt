@@ -1,0 +1,29 @@
+
+get_dung_sale: json
+    - res: = 0
+    - v: =? 1
+    - d: gh_csv
+        - Two kinds of elements:
+            - Time period:
+                - "T"
+                - start: gh_time
+                - end: gh_time
+                - color: hex6 := /[0-9A-F]{6}/
+                    ? What is the color code?
+                        - RGB?
+                        - GRB?
+                            - Color #B9FF66 is lime green, like the "NEW!" messages are.
+                            - Color #FFFF00 is still yellow.
+                    - "FFFF00": Yellow?
+                - color2: hex6
+                    - E.g. "FFB966": Orange?
+                        
+                - msg: str
+            - Dungeon:
+                - "D"
+                - dung: dungeons
+                - cost: int (in coins)
+                - unk: =? 1
+                - msg: str
+        - Blocks start with 'T' element.
+

@@ -1,0 +1,321 @@
+
+download_dungeon_data:
+    r: =0
+    v: int
+        3: on 2015-11-10 and before.
+        4: on 2015-12-22 until 2018-12-05.
+            - HT: Until 2018-10-25.
+        5: Unused?
+        6: From 2018-12-11.
+            - HT: 2018-10-25.
+    dungeons: gh_csv
+        ? Version 4 adds a checksum at the end?
+        ??? Wait maybe it's valid csv and I just screwed up before??
+
+
+Ver 6:
+    - d:
+        - Two new ints at the end.
+            - Seems to be numbering. E.g. Dungeons 1-1, 1-2.
+        - For Special dungeons, some of them have int,emptystring,int at the end.
+        - 0s at the end of the line have become emptystrings.
+    - f:
+        - Inserted a bunch of numbers in the middle:
+            - Either position 7 or 8.
+            - Seen as few as one 0 inserted, and as many as 13.
+            - Oh! They're drops?
+                - Ending 0s?
+                - With +10000 for "rare"?
+        - Removes dungeon start dates?
+            - E.g. 140908000000.
+
+
+== Attempt 2 ==
+
+dstr: raw string, or 'quoted string' (for commas)
+
+d;  six vars
+    0   id
+    1   name: dstr
+    2   ??: bitflags
+        0:4 1 if one-time dungeon
+            0 otherwise
+        4:8 are a number.
+            not sure that the bound is 8. Could be 7.
+    3   where
+        0   Normal
+        1   Special
+        2   Technical
+        3   Gift (new?)
+        4   Tournament
+        5   
+        6   (none)
+        7   Multiplayer?
+    4   0?
+        
+    5   :flags
+        examples:
+            0-2
+            5611-5614
+                post-game normals (post-KotG)
+                    NOT Twins, Zaerog
+            21612-21617
+                post-game technicals
+                    Mechdragons' Massive Fortress
+                    Ancient Dragons' Mystic Realm
+                    Domain of the War Dragons-All Att. Req.
+                    Dragon Knight Sanctuary-No Dupes
+                    Mystic Dragon Historic Site
+                    Pirate Dragon's Hidden Grotto
+                    NOT Threedia/Nordis/Arena
+            23111
+                The God-King's Floating Garden
+            38902-38911
+                Oldest descends
+            60001-60002
+                60001   biweeklies, descends, collabs, challenges
+                60002   one-shot challenge
+            60102
+                urgents
+
+
+f;
+    0   index
+    1   name
+    2   floors
+    3   ? : bitflags
+        [7]
+            - NOT the roguelike flag.
+    4   stamina
+    5   ?? : int
+        - Some of the hardest difficulties are separated from the other floors by this var?
+        - Value=0 includes:
+        - Value=1 includes:
+            - Lots of normal stuff.
+            - Necky.
+        - Values 2-30 seem to all be for collabs.
+        - Value=31 includes a lot of stuff (not collabs).
+            - Ult rushes, techs...
+            ? 
+        - Value=32+ are collabs and holidays.
+        ! GungHo Collab is =0.
+    6   ?? : int
+        - Equal to [5], except on FF Collab 1/2 and PADZ (one of them).
+    7   disables: bitflags
+        = Disables things.
+        [0] Fire Orbs.
+        [1] Water Orbs.
+        [2] Wood Orbs.
+        [3] Light Orbs.
+        [4] Dark Orbs.
+        [5] Heart Orbs.
+        [6] Active Skills.
+        [7] Leader Skills.
+        [8] Continues.
+        [9] No Coins, Eggs, or EXP. No Pal points.
+            - Equivalent to "stamina == 0".
+        [A] Awoken Skills.
+    NEW Drops (since v=6)
+        - 0-terminated list.
+        - +10000 for "rare" flag.
+            E.g. 151 means Keeper of Dark, but 10151 means Keeper of Dark [rare].
+    8   : bitflags
+        = Flags for existence of additional params.
+        - See &Varargs.
+    *   <additional params>
+        - See &Varargs.
+    
+    -3  can be "5*4" or "7*6"
+        For the normals (Hera to Sky Dragons), it says what date they're first unlocked in Normals? (2014-Sep-08)
+        War/Knight Dragons don't have it. Mythic, Mech, Whiskey, Mystic, Pirate do.
+        
+        For s-ranking, it says the S-rank score.
+c;
+    CRC?
+
+Things to find:
+    - order.
+    - location: normal, technical, special, multiplayer, coin.
+        = "How do you know where this dungeon will be placed?"
+    - color: normal, technical, conditional, special, ranking (yellow)
+    - no continues
+    - no RCV
+    - no orbs of colors X Y Z.
+    - No Awoken skills.
+    %- all attr required
+    %- attr X and Y required?
+    %- type X and Y required
+    - one-time clear
+    - unlocks
+    - ^prereqs
+        ! Co-op lets you play clear stages (as guest) that you don't have the prereqs for. It
+    - requirements (e.g. stamina req)
+    - background
+    - type/attr-based stat bonus
+        - Takemikazuchi Descended: Balanced.
+            - Balanced := 1
+        - Yamatsumi Descended!-Wood Enhanced
+            - Wood := 2
+        - Found:
+        ` btype:64;15000;15000;15000;|hp:25000|at:25000|df:10000|smsg1:1.5x to all stats for Attacker Type
+    - enemy stat bonus
+    - That weird thing where Hell Demons in Star Den are turncount 1.
+
+
+
+== Varargs ==
+
+A normal floor has 11 variables after the initial semicolon.
+
+Variable 9, AKA -3, is bitflags.
+They seem to count the number of the rest of the variables.
+    ``  # Ugh, no they don't. 32 means varargs.
+        def ones(n):
+            """Number of 1-bits in an int.
+            Count 1 twice.
+            """
+            n = int(n)
+            return list(bin(n)).count('1') + (n&1)
+        
+        assert len(floor.rawarray) == ones(floor.rawarray(9))
+
+
+Bits:
+    0:  Two variables.
+        ?= Prereqs?
+    1:  (Not used in at least around the June 2016 latest.)
+    2:  1 var :ghtime
+        ?= Unlock date?
+        
+    3:  1 var
+        = S-Rank score.
+    4:  1 var
+    5:  ?? vars
+        = Lots of things with 32 and different number of vars.
+        ! Things with 32 don't end with 0,0.
+        ! Things without 32 end with 0,0?
+        ! The vars for 32 come before those for 64.
+        - "Cost <=%d"
+            = 2,%d
+        - "Rarity <=%d"
+            = 4,%d
+        - "{Type} Only"
+            = 7,%d
+            = 7,%d,%d
+            = 7,%d,...
+            - where:
+                3: physical
+                4: healer
+                5: dragon
+                7: attacker
+                8: devil
+                = type+1 for type in types
+        - "All Att Required"
+            = 9,1,2,3,4,5
+            => attr+1 for attr in attrs
+        - "No Dupes"
+            = 10,0
+            = 10,4
+            = 10,4,2,3,4,5
+                ^ f;1,New Year Battle-No Dupes,10,128,99,31,31,0,32,10,4,2,3,4,5
+            ? 4 means "including leaders"?
+                - Check it by looking at when the "not including leaders" change went in.
+            ? Wtf does 10,4,2,3,4,5 mean for New Year Battle?
+        - 11: Special/Rogues (start at level 1)
+            - Scarlet, 
+                = 11,40,0,2000,100,24464
+            - 1037. Challenge Dungeons
+                = 11,40,0,2000,100,34464
+            - Z8, Nordis, 
+                = 11,70,0,20,5000,5000
+            - Volsung, Gainaut
+                = 11,70,0,40,5000,10000
+            - Linthia
+                = 11,70,0,40,5000,20000
+            - Special Descend Rush 
+                = 11,80,0,100,500,24464
+            - 13: 
+        - 14: "Team of %d or less"
+            = 14,%d
+    6:  1 var :str
+        ?= Special condition?
+        - Type/attr bonuses.
+        - Super King Gold multipliers.
+        - Special boards?
+        - "fc1:2594;99;99;99;99;99;99;|fc2:2713;99;99;99;99;99;99;|fc3:2416;99;99;99;99;99;99;|fc4:2418;99;99;99;99;99;99;|fc5:2420;99;99;99;99;99;99;|fc6:2594;99;99;99;99;99;99;|hp:10000|at:10000|df:10000"
+    7:  End date? :ghtime
+        - Heroines story dungeons.
+        - MIGHT also come after flag 32.
+
+
+! Parse the dungeons and normalize the columns.
+
+def dungeons_to_table(raw_dungeons):
+    gh_csv(raw_dungeons)
+    
+    output_table(expanded_dungeons)
+
+
+===
+
+
+Format of raw_dungeons:
+A bunch of things separated by '\n'.
+
+Each line is:
+    <Type:'d'>;<Num:int>,<Name:str>(,\d+){4}
+    <Type:'f'>;<Num:int>,<Name:str>(,\d+){11}
+Type ::= d | f
+        d: Dungeon (holds floors)
+        f: Floor
+Num  ::= int
+        index. lower means shown lower on the list.
+Name ::= [^,]+ | '[^']+'
+
+Tail ints:
+  d:
+    [0]: floors
+  f:
+    [0]: floors
+    [1]: mission number? no not unique
+    [2]: stamina
+    [-3]: Can be 5*4
+
+pattern = re.compile(r"d;\d+,([^,]+|'[^']+')(,\d+){4}|f;\d+,([^,]+|'[^']+')(,\d+|,\d+\*\d+){9,}")
+
+
+
+== Regex for manual parsing. ==
+
+Tableize:
+    Replace the first semi-colon.
+    >   ^(\w);
+    <   \1\t
+    Commas which are outside of an even number of quotes.
+    >   ^(?<=([^,']*+|'[^']*+')*+),
+    <   \t
+    ^ Without lookbehind:
+    >   ^(([^,']*+|(?<=\t)'[^']*+')*),
+    <   \1\t
+    ^^ Screw it.
+    ^ Looking ahead for a not-space.
+    >   ,(?! )
+    <   \t
+
+
+
+== Bits set ==
+
+# Which bits are set.
+def setbits(n):
+    #return filter(enumerate(map(int, bin(int(n))[:2][::-1]))
+    return [i for i, b in enumerate(bin(int(n))[2:][::-1]) if b == '1']
+
+
+== Ugh ==
+
+TODO:
+- Clean up these notes. Too much old contradictory garbage. Unclear what the new garbage is saying. Figure out whether I'm counting from 0 or 1.
+- Break up the parsing so I can inspect intermediate parts.
+    - E.g. So I can analyze what floors have what flag32s.
+

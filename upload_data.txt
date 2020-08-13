@@ -1,0 +1,44 @@
+SEE ALSO: "download_data notes.txt"
+
+POST action=upload_data
+/api.php?action=upload_data&pid=<PLAYERID>&sid=<SESSIONID>&type=<SEE BELOW>&r=<APP VERSION>&m=0&key=<KEY>&data=<SEE BELOW>
+
+response:
+    json
+        res: 0
+        dcnt: int
+            some increment? the version of the data.
+            independent per type
+        ?data: str (base64)
+            only if type=0
+            Updated data?
+    
+
+type=
+0   Unknown.
+    Possibly cleared dungeons?
+    data=:base 64
+1   Favorite monsters.
+    data=:JSON:
+        "fav": <LIST[MonsterIDs]>
+2   Favorite friends.
+    data=:JSON:
+        "fav": <LIST[PlayerIDs]>
+3   High scores.
+    data= : JSON: 
+        "hs": flatten(list[$Scores])
+            $Scores:
+                - "d"
+                - <DungeonID>:int
+                - <Floor>:int
+                - <Score#1 | 0>: int
+                - <Score#2 | 0>: int
+                - <Score#3 | 0>: int
+    e.g.
+        {"hs":["d",166,3,242802,63406,60604,"d",167,3,230908,70208,66504,"d",306,3,253908,114900,109806,"d",320,3,244500,82408,81702,"d",570,4,167702,32000,0,"d",357,3,241504,0,0,"d",503,3,217806,0,0,"d",516,3,242200,226000,0,"d",526,4,227308,0,0,"d",580,4,150900,0,0,"d",539,4,203806,0,0,"d",583,4,151402,54508,53700,"d",565,4,156300,0,0,"d",382,4,151836,0,0,"d",386,3,204104,65400,60002,"d",592,3,202202,0,0,"d",165,3,223504,0,0,"d",814,4,22702,0,0,"d",1009,3,166904,62700,59100,"d",172,4,128400,0,0,"d",392,4,105002,0,0,"d",339,4,331606,92604,59702,"d",804,4,110708,75902,0,"d",391,4,136908,0,0,"d",536,4,90600,0,0,"d",394,4,114002,0,0,"d",560,5,225406,0,0,"d",1034,3,156606,50306,0,"d",393,4,127000,0,0,"d",395,4,141400,0,0,"d",171,3,162008,60502,0,"d",1064,5,96806,0,0,"d",807,4,134404,0,0,"d",808,4,167702,0,0,"d",809,4,146104,0,0,"d",810,4,166200,0,0,"d",588,5,88808,86100,83808,"d",1035,3,178900,0,0,"d",1031,3,184006,0,0,"d",1059,5,139108,0,0,"d",1032,3,154602,0,0,"d",505,1,52800,0,0,"d",567,4,87204,0,0,"d",559,5,133800,0,0,"d",521,1,66800,0,0,"d",1033,3,177000,0,0,"d",522,1,99608,0,0,"d",556,5,162304,0,0,"d",1089,5,79400,73000,70402,"d",557,5,150706,0,0,"d",1041,5,151800,0,0,"d",308,4,178206,0,0,"d",591,5,169604,85904,65604,"d",558,5,107404,73704,70800,"d",316,4,97308,0,0,"d",590,5,159602,61004,56400,"d",1102,1,93414,93300,78728]}
+
+
+I haven't tried, but I think changing a Favorite and then restarting / going back to Title can force an upload.
+
+`get_player_data:dcnt` is an 8-array (last four seem to always be 0), and the array indices seem to correspond to the `type=` param here.
+

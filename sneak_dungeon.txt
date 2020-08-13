@@ -1,0 +1,69 @@
+
+request:
+    - action = sneak_dungeon
+    - pid: player id
+    - sid: session id
+    - dung: dungeon
+    - floor: which floor of that dungeon
+    - time: yymmddHHMMSSttt
+        (ttt: milliseconds?)
+    - helper: helper id
+        how does it know which?
+    - e: encrypted value
+        [0-9A-Za-z,.]+
+        Same encryption alg as for response.
+        Sample:
+                "rk=50556&bm=817&c=2009&l=99&s=5&p=99,99,92,10"
+            - rk: rxp for next rankup?
+            - 
+    - r: 841?
+        version?
+    - m: 0?
+    - key: hex{8}
+        generated each session?
+
+
+response: json
+    res: 0
+        error code
+    hash:
+        Doesn't seem to be all hash.
+        5674ad3589f13
+        ddddxxxxxxxxx
+        ddddxxxxxxxxd?
+    btype: str
+        ? Bonus type?
+    barg: str
+        ? Bonus? (E.g. "20000" for 2x)
+    fp: int
+        friend points gained?
+        0, 5, 10, 100
+    mfp: int
+        New
+        Multiplayer Friend Points gained?
+    e: str
+        Wave data (encrypted).
+        Decrypted: querystring
+                waves: list[Wave]
+                    The list of waves.
+                dh: str
+                    ??
+                rs: str
+                    ??
+        Wave: list[EnemyMon]
+            - Looks like `["w":[Mon],[Mon]]`, etc.
+            - Must remove the `"w":` before reading.
+        type EnemyMon: list[int]
+            ? Was it different before?
+            [0] ??
+            [1] Monster ID
+            [2] Level
+            [3] Drop
+                9900 for coins
+            [4] Drop var
+                e.g. coin, level.
+            [5] ??
+                
+
+
+

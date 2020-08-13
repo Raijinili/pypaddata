@@ -1,0 +1,301 @@
+download_limited_bonus_data
+    res: int
+        error code
+    v: int
+        2 for all known.
+    bonuses: list[&bonus]
+        bonus:
+            s: ghtime
+                start
+            e: ghtime
+                end
+            b: int
+                - known:
+                    1 2 3 5 6 10? 11 12 17
+                    but I want to find bonus +egg drops
+                1: XP bonus?
+                2: coins bonus
+                    a: bonus * 10000
+                    {'a': 20000, 'b': 2, 'd': 21, 'e': '151223000000', 's': '151222000000'}
+                    {'a': 20000, 'b': 2, 'd': 22, 'e': '151224000000', 's': '151223000000'}
+                3: drop bonus
+                    a: bonus * 10000
+                        (1.5 => 15000)
+                5: stamina cut
+                    a: bonus * 10000
+                        (half => 5000)
+                6: Special dungeon
+                    #appears in Special
+                    - Sometimes has an `a`.
+                        595: perma-collab
+                        3999: Tama infestation
+                        600: Descends
+                        4000: +Points cave
+                            - All-Day Dungeons
+                        597: Weekly dragons (e.g. cat dragons)
+                        4900: Monthly Quest
+                            - Also Event Gift Dungeon
+                        4905: XP of a Lifetime
+                        4110: 'Dragon Forest'
+                        4100: 'Skill Leveling Dungeon Dragonbounds & Dragon Callers'
+                        4105: 'Ultimate Dragon Research Hall-No Dupes'
+                        4120: 'Weekend Challenge!'
+                        4005: 'Skill Leveling Dungeon Godfest'
+                        a=9911: Gift mail?
+                8: PEM?
+                    i:
+                        17 for evo carnival
+                        13 for evo carnival
+                        16 for new evo carnival
+                            2020-03-13
+                9: REM?
+                    i:
+                        13 for GF part 3 on 2016Jan02
+                        5 for ??
+                    {'b': 9, 'e': '160108000000', 'i': 5, 's': '160103000000'}
+                    {'b': 9, 'e': '151225000000', 'i': 15, 's': '151218000000'}
+                    {'b': 9, 'e': '151102000000', 'i': 16, 's': '151030000000'}
+                    {'b': 9, 'e': '150925000000', 'i': 5, 's': '150918000000'}
+                    {'b': 9, 'e': '150925000000', 'i': 5, 's': '150918000000'}
+                    i:
+                        7: Forest Gala?
+                        20: ?? Gala?
+                10: PEM cost?
+                    a: 500
+                11: great/super bonus rate
+                    a: bonus * 10000
+                        (2x => 20000)
+                12: +egg rate???
+                    a: drop% * 10000
+                        (100% => 10000)
+                14: GF?
+                    a: 10000
+                15: ??
+                    a: =10000
+                    - Permanent.
+                    - Start: 170302160000
+                        = 2017 Mar 2 4PM PST.
+                    m: 'Send a Premium Egg Machine to a Friend and you will get one too!'
+                16: +egg bonus?
+                17: Skillup bonus rate (feed)
+                    a: bonus * 10000
+                   {"s":"151211000000","e":"151228000000", "b":17,"a":25000,"m":"^FFFF00^Skill Up chance x2.5^FFFFFF^"}
+                20: 
+                22:
+                    Bonus message about Vulcan?
+                    About tournaments in general?
+                    keys: s,e,d,b,m
+                23: ??
+                    "mr=150,mc=10,mt=180"
+                    {"s":"130604000000","e":"370101000000","b":23,"m":"mr=150,mc=10,mt=180"}
+                24:
+                    d: dungeon ID
+                    a: 10000, 80000
+                        - The 10000s are permanent and have no apparent pattern.
+                        - The 80000s are 8x FP in co-op.
+                    m: str
+                25: Drop rate (abs)??
+                    - A lot of the a=0 are Skillup dungeons.
+                        - Explains why skillup floors in non-skillup dungeons don't show egg drops.
+                        - Exception is Ganesha's Treasure Trove, which does drop stuff.
+                    - Basic Technical Dungeons are listed here as having 10% to 30% drop.
+                    d: dungeon
+                    a?: 
+                        none, 100: various unrelated messages
+                        ? none = default = 0?
+                    m?: message
+                        Sometimes none if a=10000.
+                    ? But it seems like the Endurance Challenges have a=0, but they DO drop stuff, don't they?
+                29:
+                    s: '190115000000'
+                    e: '190128000000'
+                    b: 29
+                    m: '^00f4fc^イベント実施中！'
+                        "The event is underway!"
+                31:
+                    s: '190107100000'
+                    e: '190121100000'
+                    b: 31
+                    m: '^00f4fc^「協力！Fate/stay night [HF]！」開催中！'
+                32: 
+                33: 
+                36: Monster XP bonus.
+                    keys: s,e,d,b,a
+                    a: 30000 => 3x
+                37: Dungeon skillup chance bonus.
+                    keys: s,e,d,b,a
+                    a: 30000 => 3x
+                38: ??
+                    keys: s,e,b,m
+                    - E.g.: '^00f4fc^Crafting Dragonbound, Chuan arrives!'
+                39: Floor-specific messages?
+                    keys: s,e,d,f,b,m
+                    - f:int is .d*1000 + floor.
+                        E.g. If d is 3599, f can be 3599006.
+                43: Limited-time dungeon (links only?)
+                    keys: s,e,d,b,m
+                    - E.g.:
+                        d: dungeon?
+                        m: 'ihttps://ssl-na.padsv.gungho.jp/time_table/index.php?pid=@ID@&sid=@SI@|LTD Schedule'
+                44: Bundle?
+                    Keys: s,e,b,m
+                    - E.g. m='^FFFF00^Dragonbound & Dragon Caller bundles available!'
+            i?: int
+            a?: int
+                amount?
+            d?: dungeon:int
+            f?: floor:int
+            m?: str
+                message
+
+
+def duration(bonus):
+    """
+    Duration in days and hours.
+    """
+    s, e = bonus['s'], bonus['e']
+    
+    diff = int((gh_date(e) - gh_date(s)).total_seconds())
+    days, rest = divmod(diff, 24*60*60)
+    hours, rest = divmod(rest, 60*60)
+    
+    assert rest == 0
+    return days, hours
+
+
+def time(s):
+    return DT.strptime(s, '%y%m%d%H%M%S').isoformat()
+#
+def process_dungeons(data):
+    """
+    dungeons:
+        info
+        floors
+    """
+    
+    raw_dungeons = data['dungeons'].splitlines()
+    
+    dungeons = []
+    
+    def parse(line):
+        prefix, rest = line.strip().split(';', 1)
+        
+        vars = []
+        
+        #Might wanna clean up the backslash \/ here.
+        #Or is that done in the json load?
+        while rest:
+            try:
+                if rest[0] == "'":
+                    cur, rest = rest[1].split("',", 1)
+                else:
+                    cur, rest = rest.split(",", 1)
+                vars.append(cur)
+            except ValueError:
+                vars.append(rest)
+                break
+        
+        return prefix, vars
+    
+    for line in raw_dungeons:
+        prefix, vars = parse(line)
+        if prefix == 'd':
+            d = Dungeon(vars)
+            dungeons.append(d)
+        elif prefix == 'f':
+            d.append(Floor(vars))
+        elif prefix == 'c':
+            #c;5015481e
+            break
+    
+    return dungeons
+
+bonuses = limited_bonus_data['bonuses']
+dungeons = process_dungeons(dungeon_data)
+
+#print out for spreadsheet
+def bonus_row(b):
+    s, e = [cell for dt in map(b.get, 'se') for cell in (dt.date().isoformat(), dt.time().isoformat(),)]
+    
+    d = b.get('d', '')
+    if d:
+        d = dungeons[int(d)].name
+    rest = [b.get(k, '') for k in 'bia']
+    
+    return [time(s), time(e), *rest, d]
+
+
+output_table(map(bonus_row, bonuses), 
+        list('sebiad'))
+
+
+#print out for spreadsheet
+with open('temp.out', 'w', 'utf-8') as f:
+    for b in bonuses:
+        s, e = [cell for dt in map(b.get, 'se') for cell in (dt.date().isoformat(), dt.time().isoformat(),)]
+        
+        d = dungeons 
+        rest = [b.get(k, '') for k in 'bia']
+        
+        
+        print(time(s), time(e), *rest, sep='\t', file=f)
+
+
+
+
+
+types:
+    ghtime: str
+        datetime.datetime.strptime($, '%y%m%d%H%M%S')
+        
+        
+tree analysis tools:
+    When going through a list:
+        of dicts:
+            def all_and_any(seq):
+                """
+                Set of things in all of them and in any of them.
+                params:
+                    seq: a sequence of collections
+                returns:
+                    every, some - every
+                    every: things in every one
+                    some-every: things only in some
+                """
+                it = iter(seq)
+                
+                every = set(next(it))
+                some = set(every)
+                
+                for item in it:
+                    every &= set(item)
+                    some |= set(item)
+                
+                return every, some - every
+            
+            all_and_any(map(dict.keys, b))
+            
+def type_coalesce(dicts):
+    """
+    params:
+        dicts: a list of dicts
+    returns:
+        for each key in the dicts:
+            whether it's optional.
+            what types its values can be.
+                if int:
+                    try to figure out a range
+                if string:
+                    try to figure out a format
+    """
+    
+    
+    
+    
+bonuses = json.loads(bah[0])['bonuses']
+
+output_table([[b.get(k, '') for k in 'sebiadm'] for b in bonuses])
+
+Tep
+
+

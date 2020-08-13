@@ -1,0 +1,28 @@
+- Reached through:
+    Others
+    -> User Info
+    -> User Settings
+
+- The setting corresponds to `get_player_data.us`.
+
+request:
+    action=user_setting
+    pid=
+    sid=
+    us: bitflags
+        [0] 2. "Reject user mail"
+        [1] 1. "Reject friend invites"
+    r=
+    m=
+    key=
+
+response: json
+    res: 0
+
+
+== Samples ==
+
+/api.php?action=user_setting&pid={PID}&sid={SID}&us=2&r=1300&m=0&key={KEY}
+/api.php?action=user_setting&pid={PID}&sid={SID}&us=0&r=1300&m=0&key={KEY}
+/api.php?action=user_setting&pid={PID}&sid={SID}&us=3&r=1300&m=0&key={KEY}
+/api.php?action=user_setting&pid={PID}&sid={SID}&us=1&r=1300&m=0&key={KEY}

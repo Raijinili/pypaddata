@@ -1,0 +1,68 @@
+
+get_user_mails:
+- REQUEST:
+    action=get_user_mails
+    pid={PLAYER_ID}
+    sid={SESSION_ID}
+    ofs=0
+        ??
+    cnt=512
+        ? Max?
+    r=1721
+        PAD version.
+    m=0
+        ?
+    key={REQUEST_KEY}
+- RESPONSE: json
+    res: =0
+    srv: int
+        Number of returned mail.
+    mails: list[list[&Mail]]
+        &Mail:
+        0. mail id: int
+        1. sender id: int
+            0 if GM
+        2. time: gh_time (str)
+        3. preview: str
+        4. &MailType
+        5. read: int (bool)
+        6. expire: str
+        7. protected: int (bool)
+        8. reward: GiftType (int)
+        9. amount: int
+            - Level for monster.
+            - Machine ID for roll.
+            - 1 for stream announce.
+            - but 0 for crown message.
+        10. count: int
+            - Monster only?
+            - Note that the count is embedded in the message preview, not computed.
+        - From 6 on (possibly 5 on), the entry is missing if it has the default value.
+
+MailType: int
+0   friend request
+1   announcement
+2   ??
+3   gift
+4   msg
+5   bestfriend
+6   roll
+7   gift dungeon
+8   
+
+GiftType: int
+0       None
+1-9899? monster
+9900    coins
+9901    stones
+9902    palpts
+9911    dung
+        ? Does it distinguish between ones with and without clear stone?
+9912    mp
+9923    unrolled machine
+        - Monster, if rolled machine.
+9935    +points
+9999    annc
+
+
+
