@@ -9,6 +9,7 @@ atts = {
     6: 'Jammer',
     7: 'Poison',
     8: 'Mortal Poison',  # Speculated.
+    9: 'Bomb',
 }
 
 
