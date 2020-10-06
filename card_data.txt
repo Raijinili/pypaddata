@@ -164,10 +164,11 @@ download_card_data:
                 b[4]: "Assist Only".
                     - Can't be put on team.
                     - Can't take latents or assists.
-                b[5]: Can take sixth Latent Slot.
+                b[5]: Can take Extra Latent Slot Tamadras.
         % 67  # Since 12.2.
             -. furigana
-                For 12.4's monster search feature (JP only).
+                - For 12.4's monster search feature (JP only).
+                - Now used in NA for search aliases.
         % 68  # Since 12.3.
             -. limit: int
                 Percentage stat increase at level 110.
@@ -178,7 +179,7 @@ download_card_data:
         % 70  # Since 1600
             default=0
             -. orbskinID
-        % 71  # Since 1800
+        % 71  :str # Since 1800
             -. transformID : /link:\d+/ < str
                 default=''
                 - ID of the card this transforms into.
