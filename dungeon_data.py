@@ -1,4 +1,3 @@
-# dungeons.py
 
 import os
 import sys
@@ -18,7 +17,8 @@ import datafiles
                 #- They are used in different places. ($ for CSV?)
         #- GH is using "#G#" for urgent jewel dragons.
     #- Figure out and fix the v=6 d; args.
-
+    #- Port these to Dataclass.
+        #- Unflatten.
 
 class Dungeon:
     # def __init__(self, raw):
@@ -90,8 +90,12 @@ class Floor:
 
 
 def parse_color(rawname):
-    if rawname[0] in '#$':
+    if rawname[0] == '$':
         color, name = rawname[1:].split(rawname[0], 2)
+    elif rawname[0] == '#':
+        #4407. '#Q##Q#November Quest Dungeon-Int'
+        color, name = rawname[1:].rsplit(rawname[0], 1)
+        # What
     else:
         color, name = None, rawname
     return color, name
