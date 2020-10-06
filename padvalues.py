@@ -33,6 +33,12 @@ types = {
     #? Protected?
 }
 
+stacktypes = {
+    0,   #Evo
+    12,  #Awaken
+    14,  #Enhance
+}
+
 awakensDict = {
     # 0: None,  # No need.
     1: 'Enhanced HP',
@@ -195,9 +201,50 @@ latents = [
     'Dark Dmg. Red.',
     'Skill Delay Resist.',
 ]
-
-
-
+# From the names of the latent tamas.
+# In order of tamas.
+latents = {
+    0: None,
+    1: 'Imp. HP',
+    2: 'Imp. ATK',
+    3: 'Imp. RCV',
+    5: 'Auto-RCV',
+    4: 'Ext. Move Time',
+    6: 'Fire Dmg. Red.',
+    7: 'Water Dmg. Red.',
+    8: 'Wood Dmg. Red.',
+    9: 'Light Dmg. Red.',
+    10: 'Dark Dmg. Red.',
+    11: 'Skill Delay Resist.',
+    12: 'All Stats Imp.',
+    20: 'God Killer',
+    21: 'Dragon Killer',
+    22: 'Devil Killer',
+    23: 'Machine Killer',
+    24: 'Balanced Killer',
+    25: 'Attacker Killer',
+    26: 'Physical Killer',
+    27: 'Healer Killer',
+    28: 'Imp. HP+',
+    29: 'Imp. ATK+',
+    30: 'Imp. RCV+',
+    31: 'Ext. Move Time+',
+    16: 'Evo Material Killer',
+    17: 'Awoken Material Killer',
+    18: 'Enhanced Material Killer',
+    19: 'Redeemable Material Killer',
+    32: 'Fire Dmg. Red.+',
+    33: 'Water Dmg. Red.+',
+    34: 'Wood Dmg. Red.+',
+    35: 'Light Dmg. Red.+',
+    36: 'Dark Dmg. Red.+',
+    # 0: 'Extra Slot',
+    13: 'Leader Change Resist.',
+    14: 'Jammer Surge Resist.',
+    15: 'Poison Surge Resist.',
+    37: 'Damage Void Piercer',
+    38: 'Att. Absorption Piercer'
+}
 
 
 
@@ -344,36 +391,140 @@ collabs = NotImplemented
 '''
 
 # Crap. I mixed up res codes and error codes.
+    # At least lower error codes correspond to result codes.
+# Some res codes may require additional arguments from the server.
 res_codes = {
     0: 'Okay',
-    2: 'relogin',  # Need to log in again.
-    8: 'dungeon not open',  # Expired.
+    2: 'relogin',  # Need to log in again. Bad sid?
+    3: "Unregistered user.",  #same as error code 3
+    8: 'Cannot enter dungeon',  # Expired / no stamina.
+    10: "Already registered as a Friend.", #same as error code
+    #12: same as error code
+    #23: "bad key param?",
+    40: "data error",
+        # {"res":40,"msg":"A data error has occurred.\\nUnable to enter dungeon.\\n\\nReturn to the title screen\\nand try again."}
+        # When unexpected: "An unexpected error has occurred." with error code 100.
+    #54: "",    # Team blob error?
+    #55: "",    #When unexpected: "An unexpected error has occurred." with error code 100.
 }
+
 # "Error Code: %d"
+# Most of these were tested on 18.40.
 error_codes = {
-    3: 'Unregistered',
+    1: "An unexpected error occurred.",
+    3: 'Unregistered user.',
         #= https://www.reddit.com/r/PuzzleAndDragons/comments/4siy66/questionjp_looking_for_someone_that_speaks/d59ntvt
-    
+    4: "The specified monster doesn't exist.",
+    5: "Not enough Stamina.",
+    6: """You have reached the max
+number of monsters. Fuse or sell
+some monsters, then try again.""",
+    7: "The user is already registered.",  # as in login?
+    8: "Unable to enter the dungeon.",
+    9: "Connection Error",  #vague
+    10: "Already registered as a Friend.",
+    11: "No more Friends can be registered", #no period
     12: 'That person has too many friends.',
         # Also res:40
-    
-    25: 'Too many friend invites.',
+        #"This user has reached their max number of Friends. They cannot register any more Friends."
+    13: "Unable to fuse.",
+    14: "Unable to sell.",
+    15: "Unable to use the Egg Machine.",
+    16: "The present was already returned.",
+    17: "Your team cost is too high.",
+    18: "You do not have enough Magic Stone(s).",
+    19: "You are not Friends with this user.",
+    20: "That name is not allowed.",
+    21: "Unable to evolve.",
+    22: "Already purchased.",
+    23: "Unknown Error",  #?
+    24: """You have reached the limit
+of the number of Friend
+Invites you can send.
+
+The Friend Invite could
+not be sent.""",
+    # 25: 'Too many friend invites.',
+    25: """This user has eached the limit
+of the number of Friend Invites
+they can receive.
+
+The Friend Invite could not be sent.""",
         # This user has reached their max
         # number of Friends. They cannot
         # register any more Friends.
+    26: "Unable to continue.",
+    27: "You have already chosen to continue.",
+    28: "Could not enter the dungeon.",
+    29: "Connection Error", #?
+    30: "The specified mail could not be found.",
+    31: "https://dl-na.padsv.gungho.jp/efl/extf<...>/adr/",  #wtf?
+        # Shows player ID above the message.
+        # No "OK" button. Can't press Back.
+        # DOES show the error code.
+    32: "Connection Error", #?
+    33: "Invalid parameters.",
+    34: "Invalid ID or Device Change Code",
+    35: "Messaging has been disabled by the other party.",
+    36: "Friend Requests have been disabled by the other party.",
+    37: "Login failed.",
+    38: "Dungeon purchase failed.",
+    39: "Best Friend selection failed.",
+    
     40: 'Cannot enter dungeon due to corrupted data',
         # HT: 'ゲームデータに不整合が発生したため、\nダンジョンに潜入できません。\n\nタイトル画面に戻り、再度お試しください。'
         # Also res:40
-    44: "No score to rank",
+    41: "This dungeon is already available.",
+    42: "Monster purchase failed.",
+    43: "Mail receipt failed.",
+    
+    # 44: "No score to rank",
         # Seen in KO when trying to view Current Rank without a score.
         # /api.php?action=rregist&pid={PID}&sid={SID}&did=1169&t=0&g=1&r=1801&m=0&key={KEY}
+        # When done right: Special popup with "Not recorded in the ranking."
+    44: "Ranking data download failed.",
+    45: "Room creation failed.",
+        # dupe?
     46: "Room creation failed.",
         # Seen when res=2.
         # Also seen as res=46 from action=mp_rmake_comp??
+    47: "Room ID creation failed.",
+    # 48: 'room not found?',
+    48: "Room not found. Either the game already started or you entered the wrong Room ID.",
+    49: "Unable to play Multiplayer Dungeon.",
+    50: """You and your partner use a different
+version of PAD. Unable to use
+the Multiplayer Mode.
 
-    48: 'room not found?',
+Please update your game
+with the latest version.""",
+    51: """Unable to start
+game due to corrupted
+data.
 
+Please try again later.""",
+    52: """Your Max Stamina is insufficient
+to play this dungeon.
+Impossible to enter.""",
+    53: """A new version is available.
+
+Please visit Google Play to
+update.""",  #Softlocks you to get you to update.
+    54: """A data error has occurred.
+Unable to enter dungeon.
+
+Return to the title screen and try again.""",
+    55: "",     #?
+    56: "DMSG",     #what
+    57: "DMSG",     #...
+    58: "DMSG",     #okay, giving up on this.
+
+    98: "An unexpected error has occurred.",
+        # Hm?
     99: 'Maintenance',
+    
+    100: "An unexpected error has occurred.",
+        # Seen when forcing res=40 on request_friend.
     
     101: 'No connection',  # Could not detect an internet connection?
     
@@ -397,11 +548,37 @@ drops = {
     9916: 'dungperm', #permanent dungeon
     9917: 'badge', #awoken badge
     
+    9923: 'machine',  #seen with 10x PEMs
+    
+    9935: 'pluspts',
+    
     9999: 'annc', #announcement again
 }
 
+# Last updated: 2020-05-26
+# Maybe fix the names some time.
 badges = {
-    
+    1: 'cost',
+    2: 'finger+',
+    3: 'all',
+    4: 'rcv+',
+    5: 'hp+',
+    6: 'atk+',
+    7: 'sb',
+    8: 'unbind',
+    9: 'sbr',
+    10: 'exp',
+    11: 'skyfall',
+    12: 'res-blind',
+    13: 'res-jammer',
+    14: 'res-poison',
+    # 15: '. (white dot)',
+    # 16: '.',
+    17: 'rcv++',
+    18: 'hp++',
+    19: 'atk++',
+    20: 'parameters+',  #all stats +10%, -400 cost
+    21: 'finger++',
 }
 
 hexcolors = {
