@@ -1,3 +1,7 @@
+action = 'download_dungeon_data'
+ver = 'dver'
+datanum = 24
+jsonkey = 'dungeons'
 
 import os
 import sys
@@ -187,16 +191,14 @@ def read_dungeons(raw, v):
 #
 
 
-def load(folder_path=None):
-    """Load the JSON from given folder.
+def load(fpath=None):
+    """Load the JSON from given folder or file path.
     """
-    if folder_path is None:
+    if fpath is None:
         import datafiles
-        folder_path = datafiles.root
-    return loadfile(os.path.join(folder_path, 'download_dungeon_data.json'))
-
-
-def loadfile(fpath):
+        fpath = datafiles.root
+    if os.path.isdir(fpath):
+        fpath = os.path.join(fpath, action+'.json')
     j = ojson_load(fpath)
     return loadjson(j)
     #TODO: Cache it based on filepath.

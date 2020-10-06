@@ -1,4 +1,9 @@
-import os
+action = 'download_card_data'
+ver = 'cver'
+datanum = 21
+jsonkey = 'card'
+
+import os, os.path
 import ast
 import json
 import warnings
@@ -10,12 +15,14 @@ from util import keys, values, items, bucketize
 import padvalues
 
 __all__ = [
-    'load',
-    'loadfile',
-    'loads',
-    'loadjson',
+    # 'load',
+    # 'loadfile',
+    # 'loads',
+    # 'loadjson',
 ]
 
+
+# Blocks alt monsters.
 INSANE_CARD_LIMIT = 9900  # Some cards don't deserve to live.
 # INSANE_CARD_LIMIT = 99000000
 
@@ -24,13 +31,17 @@ INSANE_CARD_LIMIT = 9900  # Some cards don't deserve to live.
 # from bookcard import *
 
 
-def load(folder_path=None, limit=INSANE_CARD_LIMIT):
-    """Load the JSON from given folder.
+def load(fpath=None, limit=INSANE_CARD_LIMIT):
+    """Load the JSON from given folder or file.
+    
+    If fpath not given, use datafiles.root folder.
     """
-    if folder_path is None:
+    if fpath is None:
         import datafiles
-        folder_path = datafiles.root
-    return loadfile(os.path.join(folder_path, 'download_card_data.json'), limit=limit)
+        fpath = datafiles.root
+    if os.path.isdir(fpath):
+        fpath = os.path.join(fpath, action+'.json')
+    return loadfile(fpath, limit=limit)
 
 
 def loadfile(fpath, limit=INSANE_CARD_LIMIT):

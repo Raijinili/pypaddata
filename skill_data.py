@@ -1,7 +1,12 @@
+action = 'download_skill_data'
+ver = 'sver'
+datanum = 36
+jsonkey = 'skill'
+
 import os
 
 from util import ojson_load, ojson_loads
-from util import keys, values, items, Bag
+from util import keys, values, items, Bag, Index
 import datafiles
 # from dataclass import DataClass
 # import skill_types
@@ -66,18 +71,20 @@ class Skill:
         return self.ctel == -1
     
     def __repr__(self):
-        return 'Skill(%s, %r)' % (self.id, self.name)
+        # return 'Skill(%s, %r)' % (self.id, self.name)
+        #? Remove the trailing 0s from params?
+        return f'Skill({self.id!r}, {self.name!r}, {self.sktp!r}, {self.params!r})'
 
 
-def load(folder_path=None):
-    """Load the JSON from given folder.
+
+def load(fpath=None):
+    """Load the JSON from given folder or file path.
     """
-    if folder_path is None:
-        folder_path = datafiles.root
-    return loadfile(os.path.join(folder_path, 'download_skill_data.json'))
-
-
-def loadfile(fpath):
+    if fpath is None:
+        import datafiles
+        fpath = datafiles.root
+    if os.path.isdir(fpath):
+        fpath = os.path.join(fpath, action+'.json')
     j = ojson_load(fpath)
     return loadjson(j)
 
@@ -88,10 +95,10 @@ def loads(s):
 def loadjson(j):
     """Load from JSON dict.
     """
-    raws = j['skill']
+    raws = j[jsonkey]
     v = j.get('v', 1)
     if v in {1, 1220}:  # Original version or array version.
-        skills = [Skill(i, raw) for i, raw in items(raws)]
+        skills = Index((i, Skill(i, raw)) for i, raw in items(raws))
     else:
         # raise ValueError("%r has unknown skills version %s." % (fpath, v))
         raise ValueError("Skill data has unknown skills version %s." % (v,))

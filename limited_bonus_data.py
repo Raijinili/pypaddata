@@ -1,4 +1,8 @@
 # Parsing bonus data.
+action = 'download_limited_bonus_data'
+ver = 'pver'
+datanum = 39
+jsonkey = 'bonuses'
 
 from datetime import datetime as DT
 import json
@@ -9,14 +13,11 @@ import dungeon_data
 from dataclass import DataClass
 
 
-_action = 'download_limited_bonus_data'
-
 """
 TODO:
 - Find a way to set dungeon_data.
     - Must do it in a way that doesn't depend on a global.
     ?- Or don't set it in init. Pass it in when printing.
-- Find a way to 
 
 """
 
@@ -213,16 +214,15 @@ def parse_skillup_dungeons(bonuses, dungeons):
 
 
 
-# def load(folder_path=None):
-    # """Load the JSON from given folder.
-    # """
-    # if folder_path is None:
-        # import datafiles
-        # folder_path = datafiles.root
-    # return loadfile(os.path.join(folder_path, _action+'.json'))
-
-
-def loadfile(fpath):
+def load(fpath=None):
+    """Load the JSON from given folder or file path.
+    """
+    if fpath is None:
+        import datafiles
+        fpath = datafiles.root
+        raise NotImplementedError("Oops, didn't put bonus data into datafiles folder.")
+    if os.path.isdir(fpath):
+        fpath = os.path.join(fpath, action+'.json')
     j = ojson_load(fpath)
     return loadjson(j)
     #TODO: Cache it based on filepath.
