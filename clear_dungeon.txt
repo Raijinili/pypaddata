@@ -6,19 +6,19 @@ request:
             playerid
         - sid: ?/\w{40}/
             sessionid
-        - hash:
+        - hash: :hex[13]
             ??
         - tmd: 
             time in dungeon??
-        - nxc:
+        - nxc: :hex[8]
             ??
         - dung:
         - floor:
         - v: =? 2
         - c:
             Don't know. Got values of 457-700, but also 3 (only twice though).
-        - r: /\d{3}/
-            App version, as a 3-digit num.
+        - r: /\d+/
+            App version, as an int.
         - m: =? 0
         - key: ghkey
     - Sample:
@@ -37,6 +37,7 @@ response:
         goldgain: int
             (magic stone)
             Used when clearing?
+                - Yes.
         exp, coin, gold: int
             Updated values.
         nextfloors: list
@@ -113,5 +114,30 @@ Sample: Clearing "Special Event Score Challenge!" with an S-rank.
             - Pluspoint gains.
         plp: 14970
             - Current plusses.
+
+
+
+Sample response [2020-10-04]:
+{"res":0,"v":2,"lup":0,"expgain":3082,"coingain":18688,"goldgain":0,"exp":22298755,"coin":398906420,"gold":506,"mfp":0,"mmp":0,"fp":38135,"mp":811899,"nextfloors":[],"cards":[],"pcards":[[26,7969036,75,1,1,3506,99,99,99,9,0,0,0,0,0],[27,27246687,102,1,3,5325,99,99,99,9,0,0,0,52,0],[195,2964688,80,6,0,4853,99,99,99,5,0,0,0,0,0]],"plpgain":0,"plp":13430}
+    res: =0
+    v: =2?
+    lup: Ranks gained?
+    expgain
+    coingain
+    goldgain
+    exp: New rank XP
+    coin: New coins
+    gold: New stones
+    mfp: Multiplayer friendpoints?
+    mmp: Multiplayer monster points?
+    fp: Pal Points (new)
+    mp: Monster Points (new)
+    nextfloors: :list
+    cards: Drops? :list
+    pcards: Updated playercards :list[BoxCard]
+        - Only the ones that need to update.
+    plpgain: Plus point gain
+    plp: New pluspoints
+
 
 
