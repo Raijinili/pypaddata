@@ -281,8 +281,8 @@ class BookCard(DataClass):
                                 #= Which latent is given upon feed.
         'collab',           #: -> collab
                                 #? Which collab?
-        '_flags65',         #: flags[3]
-                                #= Flags for inheritance.
+        '_flags65',         #: bitflags
+                                #= Flags for inheritance etc.
         'furigana',         #: str
         'limit',            #: int
         'voice',            #: int
@@ -319,21 +319,17 @@ class BookCard(DataClass):
                 # (c.gkey/10 if c.gkey else c.base, c.gkey, c.base, c.id),
                 # (c.gkey/10 or c.base, c.id),
                 (c.gkey/10 or c.base, c.gkey, c.base, c.id),
-        'inheritable':
-            lambda c:
-                bool(c._flags65 & 1),
-        'unstackable':  #enhance/awkn/evo mats which aren't stacked?
-            lambda c:
-                bool(c._flags65 & 8),
-        'assistonly':  #weatherlight and its preevo only
-            lambda c:
-                bool(c._flags65 & 16),
-        'extralatentslot':  #reincarnated and stuff
-            lambda c:
-                bool(c._flags65 & 32),
+        'inheritable':   lambda c: bool(c._flags65 & 0x01),
+        'canassist':     lambda c: bool(c._flags65 & 0x01),
+        'assisttarget':  lambda c: bool(c._flags65 & 0x02),
+        '_flags65_4':    lambda c: bool(c._flags65 & 0x04),
+        'nostackmat':    lambda c: bool(c._flags65 & 0x08),
+        'assistonly':    lambda c: bool(c._flags65 & 0x10),
+        'extralatents':  lambda c: bool(c._flags65 & 0x20),
         'link':
-            lambda c:
-                c and int(c._UNK1800.split(':')[1])
+            lambda c: c and int(c._UNK1800.split(':')[1]),
+        'stackable':
+            lambda c: (set(c.types) & set(padvalues.stacktypes)) and not c.nostackmat,
     }
     
     def __init__(self, raw):
