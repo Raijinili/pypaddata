@@ -1,7 +1,11 @@
-get_player_data:
+get_player_data: json
     res: 0
     friendMax: int
     friends: list[friend]
+    fridt: Friend dates? :list[int|str]
+        - Newer.
+        - Flattened list of [:int, :str(int)].
+        - Length is exactly twice of friends?
     card: list[boxcard]:
         &boxcard: list[int, 14]
             0   chr
@@ -12,7 +16,7 @@ get_player_data:
                 number of times Power Up Fusion used
                 not number of monsters fed to it
                 (does evolution/uevo count?)
-            5   id: index[cards]
+            5   card id: index[cards]
             6   plushp
             7   plusatk
             8   plusrcv
@@ -20,6 +24,13 @@ get_player_data:
                 - Name ".tamas" allows ".awakenings" for species.
             10  latents
                 - Packed bits. First four bits are the latent max?
+                - If the first four bits are 0xF, uses new format (7 bits per latent).
+                - 7 slots, none filled: =127
+                    (0xF, 7, 0, ...)
+                - 8 slots, none filled: =143
+                    (0xF, 8, 0, ...)
+                - Will be 0 unless it's been fed a Latent once, even if that latent was later removed (by evo/devo with a typed latent).
+                - Seems to always use new format now.
             11  inherit : CHR
             12  extraplus
                 - For super awakening.
@@ -33,6 +44,9 @@ get_player_data:
             4   fuses = 0
             5   id: index[cards]
             6*  rest* = 0
+    plp: :int
+        - Newer
+        - Pluspoints
     ndun: list[list<int, 3>*]
         Dungeons completed?
         [0] : dungeon
@@ -45,18 +59,24 @@ get_player_data:
             Uses `^xxxxxx^` for switching color code.
     omsg: ghmsg
         Marquee message.
+        - No longer exists?
     msg2datepd: ghtime
         Date for tomorrow's message.
+        - No longer exists?
     msg2: ghmsg
         Tomorrow's message.
+        - No longer exists?
     omsg2: ghmsg
+        - No longer exists?
     gmsg: ghmsg
         egg machine message
     gms2gdatepd: ghtime
             (^Not my typo.)
         Gacha message 2 date (of replacement?).
+        - No longer exists?
     gmsg2: ghmsg
         Gacha message.
+        - No longer exists?
     egatya: list[gacha*]
         Extra Gacha?
         - Older.
@@ -127,24 +147,38 @@ get_player_data:
         154
         169
     pver: int
-        ? limited_bonus_data version??
+        limited_bonus_data version
         443
         503
     msver: int
-        ? enemy_skill version?
+        enemy_skill version
         149
         159
     dsver: int
-        ? dungeon sale version?
+        dungeon sale version
+        a=get_dung_sale
         33
         51
     psver: int
-        ? (monster) point shop version?
+        (monster) point shop version
+        a=shop_item
         12
         22
     #new:
     alver: int
-        Quests data (dl_al) version
+        Quests (achievement list) data version
+        action=dl_al
+        ? What about al_infoall
+    #newer:
+    mever: int
+        Monster Exchange
+        action=mdatadl
+            &dtp=0
+        - As of 2020-09-24: =128
+    tlver: int
+        action=mdatadl
+            &dtp=1
+        - As of 2020-09-24: =2
     cardMax: int
         box space
     name: str
@@ -174,11 +208,29 @@ get_player_data:
         $deck: dict
             set_##: list<int, 5>
                 Each element is the chr of the monster.
+        ? No longer exists?
     deck: str
         Just a comma-delimited string of the current deck.
         (What happens with empty slots? Are they left out or are they set to 0?)
+        ? No longer exists?
     ldeck: `null`
         ??
+        ? No longer exists?
+    decksb: Newer deck format :json
+        (json):
+            fmt: 1
+            decks: :list[&deck]
+            bg: Badges available? (Very likely)
+        deck: list[int]
+            0. leader :chr
+            1. sub1 :chr
+            2. sub2 :chr
+            3. sub3 :chr
+            4. sub4 :chr
+            5. badge
+            6. helper
+            7. ??
+            8. orbskin?
     fripnt: int
         pal points
     fp_by_frd: int
@@ -190,6 +242,7 @@ get_player_data:
     pbflg: int
         ??
         NOT whether or not you got palpoints.
+        ? Present?
     curLvExp: int
         Total XP for this rank.
     nextLvExp: int
@@ -209,9 +262,20 @@ get_player_data:
         - See user_settings.txt.
     caf: int
         ??
+        Bitflags or otherwise bitpacked.
         32774 in padherder2015-05-04.json to padherder2015-06-02.json
             2**15 + 6
         6 in padherder2015-06-05.json to padherder2016-01-14.json
+    # New after PAD Pass
+    subsday: PAD Pass subscription day? :ghtime
+        - Endtime?
+        - 200721035959, which is 4AM UTC-8.
+    subs: :int
+        - Seen: 3
+    decksbs: PADPass teams?
+        Same format as decksb, but without the bg key.
+        Erased if the subscription lapses, it seems.
+    cmm: :int
     r: int
         version (e.g. 852 is version 8.5.2)
 
@@ -456,5 +520,18 @@ for mon in box:
     slv = mon[3]
     if slv > 1 and slv > skill['lcap']:
         print(card[0], slv, skill['lcap'])
+
+
+===
+
+[2020-10-04]
+Reincarnated Amaterasu with 0 extra latents, and then add two more:
+[60070,47986500,97,5,11,5938,99,99,99,9,0,58362,0,0,0]
+[60070,47987259,97,5,12,5938,99,99,99,9,127,58362,0,0,0]
+[60070,47987765,97,5,13,5938,99,99,99,9,143,58362,0,0,0]
+Then add Rcv+ (id=30):
+[60070,48077765,97,5,14,5938,99,99,99,9,990863,58362,0,0,0]
+
+0011110 0011110 1000 1111
 
 

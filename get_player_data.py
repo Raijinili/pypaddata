@@ -5,30 +5,43 @@ import dataclass
 class BoxCard(dataclass.DataClass):
     "A card in a player's box."
     fields = [
-        'chrid', # Internal ID.
+        'chr',      #0. Internal (chronological) ID.
+                        # Change to id? We do need lookup by ID.
         'xp',
         'lv',
         'slv',
-        'fuses', # Dumb and useless.
-        'no', # Monster ID.
-        'plus_hp',
+        'fuses',    #4. Useless.
+        'cid',      #5. Monster ID. (Can I change this to id?)
+        'plus_hp',  
         'plus_atk',
         'plus_rcv',
-        'tamas',
-        'latents', # Packed bits representing latents.
+        'tamas',    #9. Number of tamas (up to 10)
+        # Newer:
+        'latbits',  #10. Packed bits representing latents.
+        'inherit',  #11. Inherit's CHR
+        'saplus',   #12. Super Awakening plus progress.
+        'sawkn',    #13. Super Awakening.
+        '_unk14',   
     ]
-    __slots__ = fields
+    __slots__ = fields  #Should I slots here?
+    defaults = [0]*len(fields)  #for now.
     properties = {
-        'plusses': lambda c: c.plus_hp + c.plus_atk + c.plus_rcv,
+        'plusses': lambda m: m.plus_hp + m.plus_atk + m.plus_rcv,
+        'latents': lambda m: unpack_latents(m.latbits),
     }
     
-    def __init__(self, rawcard):
-        for name, value in zip(self.fields, rawcard):
-            setattr(self, name, value)
+    def __init__(self, raw):
+        # for name, value in zip(self.fields, raw):
+            # setattr(self, name, value)
+        # Pad with 0s.
+            #? Maybe handle defaults in DataClass
+        raw.extend(self.defaults[len(raw):])
+        
+        super().__init__(raw)
 
     # Need to override DataClass's repr.
     def __repr__(self):
-        return '%s<%r, %r>' % (type(self).__name__, self.chrid, self.no)
+        return '%s<%r, %r>' % (type(self).__name__, self.chr, self.cid)
 
 
 
@@ -98,17 +111,27 @@ def unpack_latents(raw):
     #! The latents come out backwards.
     # if raw == 0:
         # return (0,0,0,0,0)
-    ct = raw & 0x0F  #number of latent slots
+    ct = raw & 0xF  #number of latent slots
     raw >>= 4
+    if ct == 0xF:
+        # New version with more slots and bigger values.
+        ct = raw & 0xF
+        raw >>= 4
+        bpl = 7  #bits per latent
+    else:
+        bpl = 5
+    mask = (1<<bpl) - 1
     latents = []
     for _ in range(ct):
-        latents.append(raw & 0x1F)
-        raw >>= 5
+        latents.append(raw & mask)
+        raw >>= bpl
     assert raw == 0
     return tuple(latents)
 
 
 def repack_latents(latents):
+    #! Doesn't handle new version.
+        # It's fine to always use new version now, even if it doesn't use new features.
     if not any(latents):
         return 0
     raw = 5
@@ -117,4 +140,6 @@ def repack_latents(latents):
         raw |= latent << shift
         shift += 5
     return raw
+
+
 
