@@ -1,6 +1,5 @@
 ## util.py
     #= Utility things not specific to PAD.
-        ## Maybe some day I'll move them to my personal folder.
 
 from functools import lru_cache, wraps, partial
 from collections import OrderedDict
@@ -25,6 +24,43 @@ class Index(OrderedDict):
     """
     def __iter__(self):
         return iter(self.values())
+    
+    def search(db, *args, **kwargs):
+        return list(db.isearch(*args, **kwargs))
+        # E.g.: cards.search(name='Awoken', sawkns=bool)
+
+    #util.values
+    def isearch(db, name='', **kws):
+        for item in values(db):
+            if queryMatches(item, name=name, **kws):
+                yield item
+
+    def gets(db, indices):
+        """Convenience method. Look up multiple values.
+        """
+        return list(db.igets(indices))
+
+    def igets(db, indices):
+        for i in indices:
+            yield db.get(i)
+
+
+def queryMatches(item, **kws):
+    return all(
+        queryMatch(getattr(item, attr, None), q)
+        for attr, q in kws.items()
+    )
+
+def queryMatch(value, q):
+    # How should I mark relative values?
+    if value == q:
+        return True
+    if value is None:
+        return False
+    if isinstance(q, str):
+        return q in value
+    if callable(q):
+        return q(value)
 
 
 class OrderedJSON(OrderedDict):
