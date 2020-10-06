@@ -22,7 +22,7 @@ TODO:
 """
 
 #dummy
-dungeons = {}
+# dungeons = {}
 
 # keys: 'sebiadm'
 # s: start
@@ -46,6 +46,8 @@ dungeons = {}
 
 ## TODO:
 #   - Identify urgents. (They last for an hour.)
+#       - Up to three hours now.
+#       - The dungeons are tagged as "Limited", so there's a flag SOMEWHERE.
 #   - Rather than start-end times, have time categories.
 #       - Categories:
 #           - Urgent (1 hour).
@@ -89,9 +91,12 @@ class Bonus:
         1: {'b':'exp*', 'a':ghmult},
         2: {'b':'coin*', 'a':ghmult},
         3: {'b':'drop*', 'a':ghmult},
+        
         5: {'b':'stam*', 'a':ghmult},
+        
         11: {'b':'great*', 'a':ghmult},
         12: {'b':'plus%', 'a':ghchance},
+        
         16: {'b':'plus*', 'a':ghmult},
         17: {'b':'skill*', 'a':ghmult},
         
@@ -130,9 +135,10 @@ class Bonus:
     
         self.s = ghtime(raw['s'])
         self.e = ghtime(raw['e'])
-        if 'd' in raw:
-            # self.d = dungeons[int(raw['d'])]
-            self.d = dungeons.get(int(raw['d']), 'd:%s'%raw['d'])
+        # if 'd' in raw:
+            # # self.d = dungeons[int(raw['d'])]
+            # self.d = dungeons.get(int(raw['d']), 'd:%s'%raw['d'])
+        self.d = raw.get('d')
         if 'm' in raw:
             self.m = 'm'.replace('\n', r'\n')
         
@@ -168,7 +174,6 @@ class Bonus:
 #? Should each bonus have a different class?
 
 
-
 #############
 # 2020 code
 #############
@@ -184,26 +189,26 @@ b_codes = {
 }
 
 
-def parse_dungeons(bonuses, dungeons):
+def current_dungeons(bonuses, dungeons):
     """Parse out the current dungeons.
     """
     if isinstance(bonuses, str):
         bonuses = ojson_loads(bonuses)['bonuses']
     bdungs = [
-        dungeons[b.d] for b in bonuses
-        if b.b == 6
+        dungeons[b['d']] for b in bonuses
+        if b['b'] == 6
     ]
     return bdungs
 
 
-def parse_skillup_dungeons(bonuses, dungeons):
+def current_skillup_dungeons(bonuses, dungeons):
     """Parse out the current skillup dungeons.
     """
     if isinstance(bonuses, str):
         bonuses = ojson_loads(bonuses)['bonuses']
     bdungs = [
-        dungeons[b.d] for b in bonuses
-        if b.b == 25 and b.get('a', 0) == 0
+        dungeons.get(b['d'], b['d']) for b in bonuses
+        if b['b'] == 25 and b.get('a', 0) == 0
     ]
     return bdungs
 
@@ -241,12 +246,27 @@ def loadjson(j):
     v = j.get('v', 1)  # version
     if v != 2:
         warnings.warn("Bonus JSON has unknown version %s." % (v))
-    bonuses = readbonuses2(raws, v)
+    bonuses = readbonuses2(raws)
     return bonuses
 
 def readbonuses2(raws):
-    ...
-    raise NotImplementedError()
-    return list(map(Bonus, raws))
+    return Bonuses(raws)
+
+
+
+#############
+# [2020] Trying this again??
+#############
+
+
+class Bonuses:
+    def __init__(self, jlist):
+        self.bonuses = list(map(Bonus, jlist))
+    def specials(self, dungeonDB):
+        return [
+            dungeonDB[b.d]
+            for b in self.bonuses
+            if b.b == 6  #special
+        ]
 
 
