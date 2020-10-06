@@ -1,0 +1,67 @@
+The base JSONs are files the game downloads to know what else to download.
+
+base_json_url = {
+  'ios': {
+    'jp': 'https://dl.padsv.gungho.jp/base.json',
+    'na': 'https://dl-na.padsv.gungho.jp/base-na.json',
+    'kr': 'https://dl-kr.padsv.gungho.jp/base.kr-ios.json',
+    'ht': 'https://dl.padsv.gungho.jp/base.ht-ios.json',
+  },
+  'adr': {
+    'jp': 'https://dl.padsv.gungho.jp/base_adr.json',
+    'na': 'https://dl-na.padsv.gungho.jp/base-na-adr.json',
+    'kr': 'https://dl-kr.padsv.gungho.jp/base.kr-adr.json',
+    'ht': 'https://dl.padsv.gungho.jp/base.ht-adr.json',
+  },
+}
+
+Response: json:
+    res: 0 :int
+    base: API URL :str
+    rver: Version :str
+        In X.YZ format. E.g. "18.41"
+    padinfo: Current URL for PAD info :str
+        - E.g. https://dl-na.padsv.gungho.jp/pj/pad-na-200903225513.json
+        - The time is encoded in GH's time format: %y%m%d%H%M%S
+        - Contents of the JSON are a lot of text and URLs, and the front screen banners.
+    extlist: URL for ?? :str
+        - Monster list?
+    efl: URL for ?? :str
+    eula: EULA version? :int
+        - Can be different for different servers.
+    ppol: Privacy Policy version? :int
+    pj: ?? :ghtime:str
+        - Missing from NA/KR sample.
+    nextRver: Next version? :str
+        - Same format as rver.
+        - Only seen in my one-day sample for JP iOS and HT iOS.
+    upint: :int
+        - Missing from NA/KR sample.
+
+
+Parameter order:
+base.json:
+    res base rver padinfo extlist eula efl upint ppol pj nextRver
+base_adr.json:
+    res base rver padinfo extlist eula efl upint ppol pj
+base-na.json:
+    res base rver padinfo extlist efl eula ppol
+base-na-adr.json:
+    res base rver padinfo eula ppol extlist efl
+base.kr-ios.json:
+    res base padinfo rver extlist eula efl ppol
+base.kr-adr.json:
+    res base padinfo rver extlist eula efl ppol
+base.ht-ios.json:
+    res base rver padinfo extlist efl upint eula ppol pj nextRver
+base.ht-adr.json:
+    res base rver padinfo extlist efl upint eula ppol pj
+
+
+
+
+
+
+
+
+
