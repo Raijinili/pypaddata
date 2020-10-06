@@ -7,21 +7,27 @@ request:
     - floor: which floor of that dungeon
     - time: yymmddHHMMSSttt
         (ttt: milliseconds?)
-    - helper: helper id
-        how does it know which?
+    - helper: helper (player) id
     - e: encrypted value
         [0-9A-Za-z,.]+
         Same encryption alg as for response.
         Sample:
                 "rk=50556&bm=817&c=2009&l=99&s=5&p=99,99,92,10"
             - rk: rxp for next rankup?
-            - 
+                - no.
+            - Now it includes ds for team.
+            - See &e below.
     - r: 841?
         version?
     - m: 0?
     - key: hex{8}
         generated each session?
-
+- Also seen (18.4.0):
+    action pid sid dung floor time shelp curdeck e r m key
+    - shelp: self-helper CHR of the monster you're using as helper.
+        If =0: No helper.
+    - curdeck=9: I switched deck from my set deck?
+        - Optional.
 
 response: json
     res: 0
@@ -44,15 +50,15 @@ response: json
     e: str
         Wave data (encrypted).
         Decrypted: querystring
-                waves: list[Wave]
-                    The list of waves.
-                dh: str
-                    ??
-                rs: str
-                    ??
+            waves: list[Wave]
+                The list of waves.
+            dh: str
+                ??
+            rs: str
+                ??
         Wave: list[EnemyMon]
             - Looks like `["w":[Mon],[Mon]]`, etc.
-            - Must remove the `"w":` before reading.
+            - Must remove the `"w":`s before reading.
         type EnemyMon: list[int]
             ? Was it different before?
             [0] ??
@@ -62,8 +68,34 @@ response: json
                 9900 for coins
             [4] Drop var
                 e.g. coin, level.
-            [5] ??
-                
+            [5] Plusses
+
+
+
+
+== request:e ==
+
+- rk: random key?
+- bm: ??
+    - In sample n<10, seen 2100-2300.
+    - Inconsistent even with same team, no stamina loss.
+    - Based on box size + rk?
+- c: Helper card ID.
+    - c,l,s,p are missing if no helper.
+- l: Helper level.
+- s: Helper skill level.
+- p: Helper params :int[7]
+    = +hp +atk +rcv tamas eqID SA eqTamas
+        - eqID is mon ID, not CHR ID.
+- lc: Own leader CHR ID.
+- ds: Deck? Player+helper monster card IDS. :int[12]
+    [x for mon in pmons + [helpermon] for x in [mon.id, mon.eq.id]]
+- dev: Device OS codename.
+- osv: Device OS version.
+- pc: Player's monsters' CHR IDs.
+- de: =1?
+
+
 
 
 

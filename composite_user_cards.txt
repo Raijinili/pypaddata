@@ -1,0 +1,22 @@
+
+
+request:
+    /api.php?action=composite_user_cards&pid={pid}&sid={sid}&base={chr}&add1={chr}&eaw=30,30&r={r}&m=0&key={key}
+    - &eaw=30,30: New latents?
+        ? Implements latent replacement?
+        - Optional.
+
+response:
+    {"res":0,"slup":0,"aexp":90000,"coin":1299381034,"bonus":2,"rcard":[60070,48077765,97,5,14,5938,99,99,99,9,990863,58362,0,0,0],"dcuid":[4294905462]} 
+    res: 0
+    slup: Skillups?
+    aexp: Additional XP?
+    coin: Coins left?
+    bonus: XP bonus
+        0: None
+        1: Great
+        2: Super
+    rcard: Result card? :BoxCard
+    dcuid: list[chr]
+        IDs to decrease?
+

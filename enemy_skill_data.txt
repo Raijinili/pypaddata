@@ -1,10 +1,9 @@
-raw_enemy_skill_data = json_data['enemy_skills']
-
-"""
 download_enemy_skill_data
     v:
-        <missing>: First version.
-        2: Compact version.
+        <missing>: First version. JSON objects.
+            - Last seen: 2015-09-24
+        2: Compact CSV version.
+            - First seen: 2015-12-22
     enemy_skills: List[skill]
         skill: (all known skills have the same keys)
             name: str
@@ -44,15 +43,27 @@ download_enemy_skill_data
 ! Compact version: ['enemy_skills']:csv.
 0   id
 1   name
-2   sktp
-3   
-    ? Samples:
-        1800
-        180f
-        100d
-        e
-        f
-4   
+2   type
+3   :hex :bitflags
+    [0] help :str
+    [1] skp1
+    [2] skp2
+    [3] skp3
+    [4] skp4
+    [5] skp5
+    [6] skp6
+    [7] skp7
+    [8] skp8
+    [9] ratio=100
+    [10] aip0=100
+    [11] aip1=100
+    [12] aip2=10000
+    [13] aip3
+    [14] aip4
+    [15] ?? :int
+        - &0x8000
+*   Packed values.
+
 
 
 type
@@ -190,244 +201,3 @@ type
         aip4 = dmg%
     
 
-j = json.load(r"1 - download_enemy_skill_data.json")
-
-es = j['enemy_skills']
-
-
-import codecs
-
-keys = "name help type skp1 skp2 skp3 skp4 skp5 skp6 skp7 skp8 ratio aip0 aip1 aip2 aip3 aip4".split()
-
-with codecs.open('temp.out', 'w', 'utf-8') as f:
-    def write(*args, **kwargs):
-        args = map(lambda s: s.replace('\n', '\\n'), map(str, args))
-        
-        print(*args, file=f, sep='\t', **kwargs)
-    
-    write('id', *keys)
-    for i, e in enumerate(es):
-        write(i, *map(e.get, keys))
-
-"""
-
-"""
-#Before November
-
-j = json.load(open(r"download_enemy_skill_data 2015-12-22.json"))
-es_ = j['enemy_skills']
-es = Bag(es_)
-"""
-
-"""
-#Format after December:
-#CSV?
-    # It can have commas, newlines, quotes
-    #   ` 'Divine King's Warning'
-#id,name,type,flags,*args,priority,??
-# last line is c: CRC?
-
-0   id
-1   name
-    bad case: 52 'Divine King's Warning'
-2   type
-3   flags: hex
-    Which args appear.
-    Used flags: 0111100011111111
-    
-    0   help=''
-    1-8 skp#=0
-        
-    9   ratio=100
-    A   aip0=100
-    B   aip1=100
-    C   aip2=10000
-    D   aip3=0
-    E   aip4=0
-#
-
-esargs = [
-    ('help', ''),
-] + [
-    ('skp%d' % i, 0) for i in range(1, 9)
-] + [
-    ('ratio', 100),
-    ('aip0', 100),
-    ('aip1', 100),
-    ('aip2', 10000),
-    ('aip3', 0),
-    ('aip4', 0),
-]
-esnames = [arg[0] for arg in esargs]
-esdefaults = [arg[1] for arg in esargs]
-
-# def check_eskill(line):
-    # sid = int(line[0])
-    
-    # try:
-        # skill = es[sid]
-    # except IndexError: #too new
-        # return True
-    
-    # flags = int(line[3], 16)
-    
-    # #eskill = {}
-    # #eskill['name'] = line[2]
-    # #eskill['type'] = int(line[2])
-    
-    # it = iter(line[4:])
-    
-    # #skip help
-    # if flags % 2:
-        # next(it)
-    # flags //= 2
-    
-    # for arg, default in esargs[1:]:
-        # if flags % 2:
-            # val = type(default)(next(it))
-        # else:
-            # val = default
-        # flags //= 2
-        
-        # if val != skill[arg]:
-            # return False
-    
-    # return True
-
-
-# fails = [line[0] for line in lines if not check_eskill(line)]
-
-
-# def parse_enemy_skills(raw):
-    # it = peekiter(raw)
-    # line = []
-    # lines = []
-    # buf = []
-
-    # for c in it:
-        # if c == ',':
-            # line.append(''.join(buf))
-            # buf = []
-        # elif c == "'" or c == '"':
-            # assert len(buf) == 0
-            
-            # buf = list(read_until(it, c))
-            # while it.peek() not in ',\n':
-                # buf.append(c)
-                # buf.extend(read_until(it, c))
-        
-        # elif c == '\n':
-            # line.append(''.join(buf))
-            # lines.append(line)
-            # line = []
-            # buf = []
-
-        # else:
-            # buf.append(c)
-
-    # if buf:
-        # line.append(''.join(buf))
-    # if line:
-        # lines.append(line)
-    # del buf, line
-
-    # return lines[:-1] #get rid of crc
-
-
-# def read_until(iterator, end):
-    # for c in iterator:
-        # if c == end:
-            # break
-        # elif c == '\n':
-            # yield '\\n'
-        # else:
-            # yield c
-
-
-# output_table(lines)
-
-
-# for line in lines:
-    # line[3] = int(line[3], 16)
-
-
-# output_table((('"%s"' % bin(x[3])[2:].zfill(16)[::-1],) for x in lines))
-
-
-
-# set(len(line) - bitcount(line[3]) for line in lines)
-
-# es = Bag(es_)
-"""
-
-from util import Bag, gh_csv
-
-import json
-
-
-def load_enemy_skills(fname):
-    j = json.load(open(fname))
-    raw = j['enemy_skills']
-    
-    return gh_csv(raw).map(EnemySkill)
-#
-# bag = load_enemy_skills(fname)
-
-
-class EnemySkill:
-    
-    propnames = ['help', 'skp1', 'skp2', 'skp3', 'skp4', 'skp5', 'skp6', 'skp7', 'skp8', 'ratio', 'aip0', 'aip1', 'aip2', 'aip3', 'aip4']
-    all_propnames = 'id name type'.split() + propnames
-    
-    defaults = ['', 0, 0, 0, 0, 0, 0, 0, 0, 100, 100, 100, 10000, 0, 0]
-    properties = {name:i for i, name in enumerate(propnames)}
-    
-    
-    def __init__(self, raw):
-        self.raw = raw
-        self.id = int(raw[0])
-        self.name = raw[1]
-        self.type = int(raw[2])
-        
-        flags = int(raw[3], 16)
-        self.flags = [(flags & (1<<i)) != 0 for i in range(15)]
-        
-        
-        it = iter(raw[4:])
-        for i, (p, d) in enumerate(zip(self.propnames, self.defaults)):
-            if flags & (1<<i):
-                val = type(d)(next(it))
-            else:
-                val = d
-            setattr(self, p, val)
-        
-        # Make sure the iterator is exhausted
-        try:
-            next(it)
-        except StopIteration:
-            pass
-        else:
-            raise StopIteration
-    
-    
-    def to_row(self):
-        return [getattr(self, prop) for prop in self.all_propnames]
-    
-    
-    # def __getattr__(self, attr):
-        # if attr in self.properties:
-            # index = self.properties[attr]
-            # if self.flags & (1<<index):
-                # val = self.raw[
-                # setattr(self, attr, val)
-            # else:
-                # val = self.defaults[index]
-            # return val
-        # else:
-            # raise AttributeError('%r object has no attribute %r' % (type(self), attr))
-    def __repr__(self):
-        return self.name
-
-
-
-es = load_enemy_skills(r"download_enemy_skill_data 2015-12-22.json")

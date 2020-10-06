@@ -1,0 +1,39 @@
+request:
+    action: =login
+    t: ??
+        =1?
+    v: Version.
+        =18.40
+    u: user token.
+        This is the "password".
+        xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        - where x is a lowercase hex digit.
+    i: user ID.
+        This is the username.
+    ad_id: Android ID. Same format as u=.
+    ad_flag:
+        =0?
+    p: region?
+        na, ht, kr
+    dev: Device OS codename (e.g. shamu)
+    osv: Device OS version, dot-separated (e.g. 7.1.1).
+    r: Version again.
+        e.g. 1840
+    m: =0?
+    key: Checksum thing.
+
+response: json
+    res: =0
+    id: Player (internal) ID :str
+    sid: Session ID :str
+    time: GH time, yymmddHHMMSS :str
+    rlb: ="120228040000"? :str
+        Start date of server?
+        - KR/HT: 120723161500
+    mails: Number of mails?? :int
+    rdun: ???
+        Seen: null
+    tli: :int
+        =0?
+
+

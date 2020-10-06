@@ -1,3 +1,9 @@
+action = 'mdatadl'  # &dtp=0
+ver = 'mever'   #tlver for dtp=1
+datanum = 37    #37 and 38 for dtp=1
+jsonkey = 'd'   #both
+
+
 import os
 import os.path
 import warnings
@@ -50,6 +56,7 @@ def read_trades(table, v):
 class ExchangeOffer(DataClass):
     action = 'mdatadl'
     jsonkey = 'd'
+    # Is this incomplete?
     fields = [
         'A',
         '',

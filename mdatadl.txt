@@ -1,6 +1,6 @@
 
 
-json:
+mdatadl&dtp=0: json
     res: 0
     v: 1
         - As of NA/2020-01-14.
@@ -37,8 +37,75 @@ d:
     *.  Fodder list: card_id
 
 
+mdatadl&dtp=1: json
+        - Corresponds 
+    res: 0
+    v: 1
+        - As of NA/2020-09-25.
+    d: gh_csv
+        - No semicolons near start.
+        - Entry 0 is "T" (team?) followed by "M"s (monsters?).
+        T,1
+
 
 https://docs.google.com/spreadsheets/d/15MR3IjDPLZYi3wCLD8K1E--MfSoqSmwQaKcJ6aHJqZ4/edit#gid=0
+
+
+
+== dtp=1 csv ==
+
+"""
+T,1,King Tyrannos|https://www.puzzleanddragons.us/|King Tyrannos
+M,1,4425,110,99,999999,9,32,11,11,11,11,27,27,,,3917,99,1,,9,
+M,1,2278,99,99,0,9,
+M,1,1712,99,99,0,9,
+M,1,1272,99,99,0,9,
+M,1,1262,99,99,0,9,
+T,2,King Plesios|https://www.puzzleanddragons.us/|King Plesios
+M,2,4426,110,99,999999,9,60,11,11,11,11,27,27,,,3918,99,1,,9,
+M,2,1505,99,99,0,9,
+M,2,1302,99,99,0,9,
+M,2,1273,99,99,0,9,
+M,2,1264,99,99,0,9,
+T,3,King Brachys|https://www.puzzleanddragons.us/|King Brachys
+M,3,4427,110,99,999999,9,48,11,11,11,11,27,27,,,3919,99,1,,9,
+M,3,1897,99,99,0,9,
+M,3,1303,99,99,0,9,
+M,3,1274,99,99,0,9,
+M,3,1266,99,99,0,9,
+"""
+
+Format:
+T,{teamid},{name}|{url}|{teamname}
+M,{teamid},{cid},{lv},{slv?},{plusses?},9,{sa},{lat0},{lat1},{lat2},{lat3},{lat4},{lat5},{lat6?},{lat7?},{assistID},{assistLv},{assistSkLv},{assistPlusses?},{assistTamas?},{}
+M,{teamid},{cid},{lv},{slv?},0,9,{}
+
+Known facts about the team:
+- Only the team leader had +297.
+- Internal skill level was capped.
+- Tamas=9 except for the equip, but all are capped. (Five cards had 9 awakenings.)
+
+Untouched Brachy team:
+[[70974, 10000000, 99, 1, 0, 3919, 0, 0, 0, 5, 0, 0, 0, 0, 0],
+ [70975,
+  51500000,
+  110,
+  23,
+  0,
+  4427,
+  99,
+  99,
+  99,
+  9,
+  97518890097519,
+  70974,
+  0,
+  48,
+  0],
+ [70976, 3000000, 99, 6, 0, 1897, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+ [70977, 3000000, 99, 8, 0, 1303, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+ [70978, 3000000, 99, 11, 0, 1274, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+ [70979, 4000000, 99, 7, 0, 1266, 0, 0, 0, 9, 0, 0, 0, 0, 0]]
 
 
 == [py] Testing ==
@@ -46,7 +113,7 @@ https://docs.google.com/spreadsheets/d/15MR3IjDPLZYi3wCLD8K1E--MfSoqSmwQaKcJ6aHJ
 from util import *
 from padutil import gh_csv
 
-j = ojson_load('mdata.json')
+j = ojson_load('mdatadl.json')
 data = gh_csv(j['d'])
 
 with open('temp.out', 'w', encoding='utf8') as file:

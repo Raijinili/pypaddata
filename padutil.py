@@ -55,15 +55,23 @@ def gh_csv(raw):
     """
     Gungho's terrible CSV with unescaped quotes.
         ? Wait maybe it's valid csv and I just screwed up before??
+            - Maybe it was enemy_skill_data that ruined things.
+        - Need to handle newlins within quotes.
     
     CSV is used in:
+        - enemy_skill_data
+            - No first semicolon
+            - Apos within strings.
+            - No empty fields.
         - dungeon_data
         - get_dung_sale (without first semi-colon)
         - shop_item (without first semi-colon)
         - dl_al (without first semi-colon)
-            
     """
-    lines = raw.splitlines(True)
+    if isinstance(raw, str):
+        lines = raw.splitlines(True)
+    else:
+        lines = raw
     # # ugh
     # # Hopefully they never put a ' at the end of a line.
     # lines = (line
@@ -87,7 +95,8 @@ def gh_csv(raw):
         delimiter=',',
         quotechar="'",
         doublequote=True,
-        strict=True)
+        strict=True,
+    )
     
     result = list(csvraw)
     # assert result[-1][0] == 'c' #crc

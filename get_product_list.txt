@@ -1,12 +1,20 @@
 Magic Stone Shop.
 
 Request:
-    /api.php?action=get_product_list&pid={PID}&sid={SID}&tier=2&r=1820&m=0&key={KEY}
+    /api.php?action=get_product_list&pid={PID}&sid={SID}&tier=2&r={r}&m=0&key={KEY}
+    - What's tier 1? Wait, is that the version number?
+
 
 Response:
     res: =0
-    items: list[ShopItem]
+    items: list[ShopItem :json]
     &ShopItem:
+        - There are two witnessed arg orders [2020-03-26]:
+            name code price bmsg spc stone buyable price_num
+            name code price bmsg price_num price_int stone buyable
+        - Now I see ([2020-10-03] HT):
+            name code price bmsg spc stone buyable
+            name code price price_int stone buyable
         name: :str
             - Message
         code: :str
@@ -32,8 +40,9 @@ Response:
             - int for old, str for new.
         buyable: =1?
             - Not sure if buying changes this.
-        priceint
-        price
-        - There are two witnessed arg orders [2020-03-26]:
-            name code price bmsg spc stone buyable price_num
-            name code price bmsg price_num price_int stone buyable
+        price_int: :int
+        price_num: :str
+            - E.g. "0.99"
+
+
+

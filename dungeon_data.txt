@@ -160,7 +160,7 @@ Things to find:
         ` btype:64;15000;15000;15000;|hp:25000|at:25000|df:10000|smsg1:1.5x to all stats for Attacker Type
     - enemy stat bonus
     - That weird thing where Hell Demons in Star Den are turncount 1.
-
+    - Dungeon background, music.
 
 
 == Varargs ==
@@ -318,4 +318,14 @@ TODO:
 - Clean up these notes. Too much old contradictory garbage. Unclear what the new garbage is saying. Figure out whether I'm counting from 0 or 1.
 - Break up the parsing so I can inspect intermediate parts.
     - E.g. So I can analyze what floors have what flag32s.
+
+
+== [2020-09-26] d.raw[6] ==
+
+Possible values: 0, 1, 2, 3, 101, 102, 103, 202, 1001, 1002, 2000, 2001
+    0   1   2   3 
+        101 102 103
+            202
+        1001 1002
+    2000 2001
 

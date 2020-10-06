@@ -1,0 +1,70 @@
+Most mail things.
+
+get_user_mails:
+    Retrieve list of mail.
+REQ: action=get_user_mails&pid={PID}&sid={SID}&ofs=0&cnt=512&r={R}&m=0&key={KEY}
+    ofs: int?
+    cnt: Max mail to receive? :int
+RESP: json
+    res: =0
+    srv: Number of mails on server :int
+        If bigger than 512, then only 512 mails will be in this response.
+    mails: list[&mail]
+        &mail: list
+        0. msgid
+        1. user :pid
+        2. time :ghtime (str)
+        3. msg :str (fmt)
+            - E.g. "%s"
+        4. mailtype :int
+            1: Notice
+            2: 
+                ? friend request?
+            3: gift
+            4: user mail
+            5: bestfriend?
+            6: egg machine?
+            7: dungeon
+        5. read :int
+        6. expire :ghtime (str)
+            - Empty if read.
+        7. protected :int
+        # The rest are not mandatory. Actually, if a usermail isn't protected, is it mandatory?
+        8. item: See padvalues.drops
+            9911: dungeon
+        9. ?? :int
+            For gift dungeon, it's the dungeon ID.
+            For monsters, it's the level.
+        10. :int
+            For stackable monsters, it's the count.
+            Default 1, I guess. Sometimes explicitly 1 anyway?
+- Structure by mailtype:
+    1: [id,user,time,msg,1,read,expire,protect,9999,1?]
+        - Final 1 is optional.
+    4: [id,user,time,msg,type=4,read,expire,protect]
+    5: [id,user,time,msg='',type=5,read,expire='',protect]
+    6: [id,user,time,msg,type=6,read,expire,protect,reward,machine?]
+        For last two values:
+        - Old ones (read) only have the monster rolled.
+        - Newer ones (read) have [monster, machine num].
+        - Multidrop (read) has [0,320].
+            - Should see what they looked like before.
+        - Unread 10x gems have [9923, machine num].
+        - (Read) stonerem have [9901, amt].
+    7: [id,user,time,msg,type=7,read,expire,protect,reward=9911,dungeon]
+
+get_user_mail:
+    Retrieves one mail.
+REQ: action=get_user_mail&pid={PID}&sid={SID}&msgid={MSGID}&r=1840&m=0&key={KEY}
+    msgid: int
+RESP: json
+    res: =0
+    body: :str
+    item_offered: int
+    - Notably doesn't have info on an offered dungeon.
+
+mail_sds: Mail dungeon start.
+REQ: action=mail_sds&pid={PID}&sid={SID}&msgid={MSGID}&r=1840&m=0&key={KEY}
+RESP: json
+    res: =0
+- Causes a redownload of limited_bonus_data
